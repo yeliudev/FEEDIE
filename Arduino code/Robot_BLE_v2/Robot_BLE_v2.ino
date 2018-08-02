@@ -107,7 +107,6 @@ void ServoACharacteristicWritten(BLECentral &central, BLECharacteristic &charact
 
 void ServoBCharacteristicWritten(BLECentral &central, BLECharacteristic &characteristic)
 {
-  // central wrote new value to characteristic, update LED
   Serial.print("ServoB Control: ");
   servoB.write((byte)BLE_ServoB.value());
   Serial.println((byte)BLE_ServoB.value(), DEC);

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # ********************************************
-# Voice Recognition Model v1
+# Voice Recognition Model v2
 # for feeding robot arm
 # By Ye Liu
 # Aug 2 2018
@@ -10,6 +10,7 @@
 
 import wave
 import pyaudio
+import nltk
 from time import sleep
 from os import remove
 from aip import AipSpeech
@@ -32,10 +33,13 @@ class VoiceRecognition(object):
         self.RECORD_SECONDS = 1
         self.WAVE_OUTPUT_FILENAME = 'test.wav'
 
+        self.NN_IGNORE_LIST = ['piece']
+
     def get_file_content(self, filePath):
         with open(filePath, 'rb') as fp:
             return fp.read()
 
+    # Return keywords of the speech
     def recognize(self):
         # Recognize voice via Baidu API
         res = self.client.asr(self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
@@ -46,11 +50,24 @@ class VoiceRecognition(object):
         remove(self.WAVE_OUTPUT_FILENAME)
 
         if res['err_no'] == 0:
-            print('Result:', res['result'], '\n')
-            return res['result']
+            print('Result:', res['result'][0])
+            keywords = []
+
+            words = nltk.word_tokenize(str(res['result'][0]))
+            tagged_words = nltk.pos_tag(words)
+            # print('Tagged:', tagged_words)
+
+            print('Keyword:', end=' ')
+            for item in tagged_words:
+                if item[1] == 'NN' and item[0] not in self.NN_IGNORE_LIST:
+                    keywords.append(item[0])
+                    print(item[0], end=' ')
+            print('\n')
+
+            return keywords
         else:
             print('Error:', res['err_msg'], '\n')
-            return res['err_msg']
+            return False
 
     def Monitor(self):
         print('* testing noise')
@@ -93,6 +110,7 @@ class VoiceRecognition(object):
                 data = stream.read(self.CHUNK)
                 frames.append(data)
                 index += 1
+
             audio_data = np.fromstring(data, dtype=np.short)
             # large_sample_count = np.sum(audio_data > noise + 400)
             temp = np.max(audio_data)
