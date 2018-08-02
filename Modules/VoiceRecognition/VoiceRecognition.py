@@ -16,7 +16,7 @@ from aip import AipSpeech
 import numpy as np
 
 
-class VoiceDetection(object):
+class VoiceRecognition(object):
 
     def __init__(self):
         self.APP_ID = '11615546'
@@ -123,5 +123,5 @@ class VoiceDetection(object):
 
 
 if __name__ == '__main__':
-    detector = VoiceDetection()
+    detector = VoiceRecognition()
     detector.Monitor()
