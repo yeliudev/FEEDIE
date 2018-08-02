@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # ********************************************
-# Voice Detection Model v1
+# Voice Recognition Model v1
 # for feeding robot arm
 # By Ye Liu
 # Aug 2 2018
