@@ -31,9 +31,10 @@ class VoiceRecognition(object):
         self.RATE = 16000
         self.CHANNELS = 1
         self.RECORD_SECONDS = 1
-        self.WAVE_OUTPUT_FILENAME = 'test.wav'
+        self.WAVE_OUTPUT_FILENAME = 'output.wav'
 
-        self.NN_IGNORE_LIST = ['piece']
+        self.NN_IGNORE_LIST = ['piece', 'cup',
+                               'bottle', 'bar', 'spoon', 'bowl', 'oh']
 
     def get_file_content(self, filePath):
         with open(filePath, 'rb') as fp:

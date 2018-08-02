@@ -57,5 +57,5 @@ class FaceRecognition(object):
 
 if __name__ == '__main__':
     # 0 for original camera, 1 for webcam
-    detector = FaceRecognition("FaceRecognition", 1)
+    detector = FaceRecognition("FaceRecognition", 0)
     detector.CatchUsbVideo()
