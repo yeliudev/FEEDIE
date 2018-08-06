@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import cv2
+import serial
 
 
 class FaceRecognition(object):
@@ -17,6 +18,8 @@ class FaceRecognition(object):
         self.cap = cv2.VideoCapture(camera_idx)
         self.classfier = cv2.CascadeClassifier(
             "/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml")
+
+        self.ser = serial.Serial('/dev/cu.usbmodem14141', 9600)
 
     def CatchUsbVideo(self):
         while self.cap.isOpened():
@@ -36,6 +39,16 @@ class FaceRecognition(object):
                 for (x, y, w, h) in faceRects:
                     center_x = x + w / 2
                     center_y = y + h / 2
+
+                    print(center_x, frame.shape[0]/2)
+
+                    if center_x <= frame.shape[1] / 2:
+                        self.ser.write('r'.encode())
+                    else:
+                        self.ser.write('l'.encode())
+
+                    line = self.ser.readline()
+                    print(line.decode())
 
                     cv2.putText(frame, '(%d,%d)' % (center_x, center_y),
                                 (10, 30), self.font, 1, (255, 0, 255), 3)
@@ -57,5 +70,5 @@ class FaceRecognition(object):
 
 if __name__ == '__main__':
     # 0 for original camera, 1 for webcam
-    detector = FaceRecognition("FaceRecognition", 0)
+    detector = FaceRecognition("FaceRecognition", 1)
     detector.CatchUsbVideo()

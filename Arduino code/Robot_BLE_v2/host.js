@@ -6,51 +6,14 @@ var servoE_characteristic = null;
 var servoF_characteristic = null;
 var servoG_characteristic = null;
 var reset_characteristic = null;
+
 var servoA_default = 60;
 var servoB_default = 100;
 var servoC_default = 100;
 var servoD_default = 100;
 var servoE_default = 100;
 var servoF_default = 100;
-var servoG_default = 0;
-
-function init() {
-    if (isWebBluetoothEnabled()) {
-        console.log("BLE is enabled!");
-        var pAsliderelement = document.getElementById('servoAslider');
-        pAsliderelement.value = servoA_default;
-        var pBsliderelement = document.getElementById('servoBslider');
-        pBsliderelement.value = servoB_default;
-        var pCsliderelement = document.getElementById('servoCslider');
-        pCsliderelement.value = servoC_default;
-        var pDsliderelement = document.getElementById('servoDslider');
-        pDsliderelement.value = servoD_default;
-        var pEsliderelement = document.getElementById('servoEslider');
-        pEsliderelement.value = servoE_default;
-        var pFsliderelement = document.getElementById('servoFslider');
-        pFsliderelement.value = servoF_default;
-        var pGsliderelement = document.getElementById('servoGslider');
-        pGsliderelement.value = servoG_default;
-    }
-    else {
-        console.log("BLE is not enabled in this web browser!")
-    }
-}
-
-function isWebBluetoothEnabled() {
-    if (navigator.bluetooth) {
-        return true;
-    } else {
-        alert('Web Bluetooth API is not available.\n' +
-            'Please make sure the "Experimental Web Platform features" flag is enabled. (in chrome://flags)');
-        return false;
-    }
-}
-function getUsbVendorName(value) {
-    // Check out page source to see what valueToUsbVendorName object is.
-    return value +
-        (value in valueToUsbVendorName ? ' (' + valueToUsbVendorName[value] + ')' : '');
-}
+var servoG_default = 10;
 
 function onDiscoverService() {//start searching for BLE devices
     var discoverservice = document.getElementById("discover");//hide the button
@@ -78,23 +41,16 @@ function onDiscoverService() {//start searching for BLE devices
             let queue = Promise.resolve();
             services.forEach(service => {
                 queue = queue.then(_ => service.getCharacteristics().then(characteristics => {
-                    //if (service.uuid==['47442014-0f63-5b27-9122-728099603712'])//looking for e-AR sensor
-                    if (service.uuid == ['47452000-0f63-5b27-9122-728099603712'])//looking for robotic arm
-                    {
-                        console.log("> Service: Robotic Arm");//got it
-                        //var canvastable=document.getElementById("canvastable");
-                        //canvastable.hidden=false;            
-                        //draw();
+                    if (service.uuid == ['47452000-0f63-5b27-9122-728099603712']) {
+                        console.log("> Service: Robotic Arm");
                     }
-                    else if (service.uuid == ['0000180a-0000-1000-8000-00805f9b34fb'])//this is device information
+                    else if (service.uuid == ['0000180a-0000-1000-8000-00805f9b34fb'])
                     {
                         console.log("> Service: Device Info");
                     }
-                    else console.log('> Service: ' + service.uuid);//other services
-                    //scan for all characteristics of the service
+                    else console.log('> Service: ' + service.uuid);
                     characteristics.forEach(characteristic => {
-                        if (characteristic.uuid == ['47452001-0f63-5b27-9122-728099603712']) {// console.log(">> Characteristic: Servo A");                
-                            //console.log("servo A");
+                        if (characteristic.uuid == ['47452001-0f63-5b27-9122-728099603712']) {
                             servoA_characteristic = characteristic;
                             var servoA_control = document.getElementById("servoA");
                             servoA_control.hidden = false;
@@ -153,6 +109,7 @@ function onDiscoverService() {//start searching for BLE devices
             console.log('Argh! ' + error);
         });
 }
+
 var servoA_state = 0;
 function onButtonClick() {
     var newvalue = Uint8Array.of(0);
@@ -162,6 +119,7 @@ function onButtonClick() {
     if (servoA_characteristic != null)
         servoA_characteristic.writeValue(newvalue);
 }
+
 function onSliderA(value) {
     if (servoA_characteristic == null) return;
     console.log("servoA:" + value);
@@ -182,37 +140,41 @@ function onSliderC(value) {
     newvalue = Uint8Array.of(value);
     servoC_characteristic.writeValue(newvalue);
 }
+
 function onSliderD(value) {
     if (servoD_characteristic == null) return;
     console.log("servoD:" + value);
     newvalue = Uint8Array.of(value);
     servoD_characteristic.writeValue(newvalue);
 }
+
 function onSliderE(value) {
     if (servoE_characteristic == null) return;
     console.log("servoE:" + value);
     newvalue = Uint8Array.of(value);
     servoE_characteristic.writeValue(newvalue);
 }
+
 function onSliderF(value) {
     if (servoF_characteristic == null) return;
     console.log("servoF:" + value);
     newvalue = Uint8Array.of(value);
     servoF_characteristic.writeValue(newvalue);
 }
+
 function onSliderG(value) {
     if (servoG_characteristic == null) return;
     console.log("servoG:" + value);
     newvalue = Uint8Array.of(value);
     servoG_characteristic.writeValue(newvalue);
 }
+
 function onReset() {
     if (reset_characteristic == null) return;
     console.log("reset");
     newvalue = Uint8Array.of(0);
     reset_characteristic.writeValue(newvalue);
 }
-/* Utils */
 
 function getSupportedProperties(characteristic) {//find the details of a characteristic
     let supportedProperties = [];
