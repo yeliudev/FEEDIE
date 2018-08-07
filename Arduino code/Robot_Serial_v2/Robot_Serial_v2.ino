@@ -10,16 +10,16 @@
 #define ROBOT_NAME "Friday"
 
 #define ELBOW_MIN 0
-#define ELBOW_MAX 140
-#define ELBOW_DEFAULT 60
+#define ELBOW_MAX 60
+#define ELBOW_DEFAULT 10
 
 #define SHOULDER_MIN 0
 #define SHOULDER_MAX 165
-#define SHOULDER_DEFAULT 100
+#define SHOULDER_DEFAULT 60
 
-#define WRIST_X_MIN 0
+#define WRIST_X_MIN 30
 #define WRIST_X_MAX 180
-#define WRIST_X_DEFAULT 80
+#define WRIST_X_DEFAULT 160
 
 #define WRIST_Y_MIN 0
 #define WRIST_Y_MAX 90
@@ -27,11 +27,11 @@
 
 #define WRIST_Z_MIN 0
 #define WRIST_Z_MAX 180
-#define WRIST_Z_DEFAULT 66
+#define WRIST_Z_DEFAULT 90
 
 #define BASE_MIN 0
 #define BASE_MAX 180
-#define BASE_DEFAULT 90
+#define BASE_DEFAULT 100
 
 #define CRAW_MIN 10 // open
 #define CRAW_MAX 82 // close
@@ -50,6 +50,10 @@ Servo servoG;
 
 int pos, speed, currentA, currentB, currentC, currentD, currentE, currentF, currentG;
 
+String buffer = "";
+int coordinate[2] = {0};
+int flag = 0;
+
 void servoReset()
 {
   currentA = servoA.read();
@@ -60,7 +64,7 @@ void servoReset()
   currentF = servoF.read();
   currentG = servoG.read();
 
-  speed = 500;
+  speed = 200;
   for (pos = 0; pos <= speed; pos++)
   {
     servoA.write(int(map(pos, 0, speed, currentA, ELBOW_DEFAULT)));
@@ -91,7 +95,34 @@ void setup()
 
 void loop()
 {
+  int j = 0;
+
   if (Serial.available() > 0)
   {
+    buffer = Serial.readString();
+    flag = 1;
   }
-}
+
+  if (flag == 1)
+  {
+    for (int i = 0; i < buffer.length(); i++)
+    {
+      if (buffer[i] == ',')
+      {
+        j++;
+      }
+      else
+      {
+        coordinate[j] = coordinate[j] * 10 + (buffer[i] - '0');
+      }
+    }
+
+    buffer = String("");
+    flag = 0;
+
+    for (int i = 0; i < 2; i++)
+    {
+      Serial.println(coordinate[i]);
+      coordinate[i] = 0;
+    }
+  }
