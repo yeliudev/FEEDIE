@@ -11,7 +11,7 @@
 
 #define ELBOW_MIN 0
 #define ELBOW_MAX 60
-#define ELBOW_DEFAULT 10
+#define ELBOW_DEFAULT 30
 
 #define SHOULDER_MIN 0
 #define SHOULDER_MAX 165
@@ -48,11 +48,8 @@ Servo servoE;
 Servo servoF;
 Servo servoG;
 
-int pos, speed, currentA, currentB, currentC, currentD, currentE, currentF, currentG;
-
-String buffer = "";
-int coordinate[2] = {0};
-int flag = 0;
+int pos, speed, currentA, currentB, currentC, currentD, currentE, currentF, currentG, len, coordinate[2], j;
+String buffer;
 
 void servoReset()
 {
@@ -64,7 +61,7 @@ void servoReset()
   currentF = servoF.read();
   currentG = servoG.read();
 
-  speed = 200;
+  speed = 800;
   for (pos = 0; pos <= speed; pos++)
   {
     servoA.write(int(map(pos, 0, speed, currentA, ELBOW_DEFAULT)));
@@ -76,6 +73,19 @@ void servoReset()
     servoG.write(int(map(pos, 0, speed, currentG, CRAW_DEFAULT)));
     delay(5);
   }
+}
+
+void refresh()
+{
+  buffer = "";
+  len = 0;
+  j = 0;
+  coordinate[0] = 0;
+  coordinate[1] = 0;
+}
+
+void servoTurnLeft(char index, int angle)
+{
 }
 
 void setup()
@@ -91,21 +101,20 @@ void setup()
   servoG.attach(8);
 
   servoReset();
+  refresh();
 }
 
 void loop()
 {
-  int j = 0;
-
   if (Serial.available() > 0)
   {
-    buffer = Serial.readString();
-    flag = 1;
+    buffer = Serial.readStringUntil('q');
+    len = buffer.length();
   }
 
-  if (flag == 1)
+  if (len)
   {
-    for (int i = 0; i < buffer.length(); i++)
+    for (int i = 0; i < len; i++)
     {
       if (buffer[i] == ',')
       {
@@ -117,12 +126,10 @@ void loop()
       }
     }
 
-    buffer = String("");
-    flag = 0;
-
-    for (int i = 0; i < 2; i++)
+    if (coordinate[0] < CLIENT_MIDDLE_X)
     {
-      Serial.println(coordinate[i]);
-      coordinate[i] = 0;
     }
+
+    refresh();
   }
+}

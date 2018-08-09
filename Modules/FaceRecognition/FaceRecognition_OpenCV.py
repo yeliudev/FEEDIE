@@ -36,22 +36,21 @@ class FaceRecognition(object):
 
             # Face recognition
             faceRects = self.classfier.detectMultiScale(
-                grey, scaleFactor=1.3, minNeighbors=3, minSize=(32, 32))
+                grey, scaleFactor=1.3, minNeighbors=3, minSize=(200, 200))
 
             if len(faceRects) > 0:
                 for (x, y, w, h) in faceRects:
                     center_x = x + w / 2
                     center_y = y + h / 2
 
-                    print(center_x, frame.shape[0] / 2)
+                    # # Send serial data
+                    # coordinate = str(center_x) + ',' + str(center_y) + 'q'
+                    # self.ser.write(coordinate.encode())
+                    # print('Send:', coordinate)
 
-                    # if center_x <= frame.shape[1] / 2:
-                    #     self.ser.write('r'.encode())
-                    # else:
-                    #     self.ser.write('l'.encode())
-
-                    # line = self.ser.readline()
-                    # print(line.decode())
+                    # # Receive serial data
+                    # res = self.ser.readline()
+                    # print('Receive:', res.decode(), '\n')
 
                     cv2.putText(frame, '(%d,%d)' % (center_x, center_y),
                                 (10, 30), self.font, 1, (255, 0, 255), 3)
@@ -73,5 +72,5 @@ class FaceRecognition(object):
 
 if __name__ == '__main__':
     # 0 for original camera, 1 for webcam
-    detector = FaceRecognition("FaceRecognition", 0)
+    detector = FaceRecognition("FaceRecognition", 1)
     detector.CatchUsbVideo()
