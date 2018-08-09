@@ -17,7 +17,7 @@ from aip import AipSpeech
 import numpy as np
 
 
-class VoiceRecognition(object):
+class VoiceRecognizer(object):
 
     def __init__(self):
         self.APP_ID = '11615546'
@@ -43,34 +43,41 @@ class VoiceRecognition(object):
     # Return keywords of the speech
     def recognize(self):
         # Recognize voice via Baidu API
-        res = self.client.asr(self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
-            'dev_pid': 1737,
-        })
+        try:
+            res = self.client.asr(self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
+                'dev_pid': 1737,
+            })
+        except:
+            print('Error: 404 Not Found\n')
+            return False
 
         # Remove temp wav file
         remove(self.WAVE_OUTPUT_FILENAME)
 
         if res['err_no'] == 0:
-            print('Result:', res['result'][0])
-            keywords = []
+            # print('Result:', res['result'][0])
 
             words = nltk.word_tokenize(str(res['result'][0]))
             tagged_words = nltk.pos_tag(words)
             # print('Tagged:', tagged_words)
 
-            print('Keyword:', end=' ')
+            for item in tagged_words:
+                if item[1] == 'NN' and item[0] in ['bread', 'breath', 'crap', 'crab']:
+                    print('Keyword: bread\n')
+                    return 'bread'
+
             for item in tagged_words:
                 if item[1] == 'NN' and item[0] not in self.NN_IGNORE_LIST:
-                    keywords.append(item[0])
-                    print(item[0], end=' ')
-            print('\n')
+                    print('Keyword:', item[0], '\n')
+                    return item[0]
 
-            return keywords
+            print('No keyword found\n')
+            return False
         else:
             print('Error:', res['err_msg'], '\n')
             return False
 
-    def Monitor(self):
+    def monitor(self):
         print('* testing noise')
         sleep(1)
 
@@ -138,9 +145,12 @@ class VoiceRecognition(object):
                 wf.writeframes(b''.join(rec))
                 wf.close()
 
-                self.recognize()
+                res = self.recognize()
+
+                if res == 'bread':
+                    return res
 
 
 if __name__ == '__main__':
-    detector = VoiceRecognition()
-    detector.Monitor()
+    detector = VoiceRecognizer()
+    detector.monitor()
