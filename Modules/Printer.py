@@ -25,5 +25,5 @@ class Printer(object):
 
 
 if __name__ == '__main__':
-    printer = Printer('/dev/cu.usbmodem14131')
+    printer = Printer('/dev/cu.usbmodem14141')
     printer.print()

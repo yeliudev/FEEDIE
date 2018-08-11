@@ -8,8 +8,7 @@
 # Aug 10 2018
 # ********************************************
 
-import threading
-import time
+import os
 from VoiceRecognizer import VoiceRecognizer
 from ObjectRecognizer import ObjectRecognizer
 from Printer import Printer
@@ -17,15 +16,13 @@ from Printer import Printer
 # Set serial port
 port = '/dev/cu.usbmodem14131'
 
-# Class instantiation
-objectRecognizer = ObjectRecognizer(
-    'ObjectRecognition', 0, port)
-voiceRecognizer = VoiceRecognizer()
-printer = Printer(port)
+# printer = Printer(port)
 
-videoThread = threading.Thread(
-    target=objectRecognizer.CatchUsbVideo, name='CatchUsbVideo')
-videoThread.start()
-
-time.sleep(5)
-objectRecognizer.switchClassfier('bread')
+pid = os.fork()
+if pid:
+    voiceRecognizer = VoiceRecognizer()
+    voiceRecognizer.monitor()
+else:
+    objectRecognizer = ObjectRecognizer(
+        'ObjectRecognition', 0, port)
+    objectRecognizer.catchUsbVideo()

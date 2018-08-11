@@ -23,12 +23,12 @@ class ObjectRecognizer(object):
         self.faceClassfier = cv2.CascadeClassifier(
             "/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml")
         self.breadClassfier = cv2.CascadeClassifier(
-            "/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml")
+            "/Volumes/Data/CNN/data/cascade.xml")
         self.classfier = self.faceClassfier
 
         self.ser = serial.Serial(port, 9600)
 
-    def CatchUsbVideo(self):
+    def catchUsbVideo(self):
         cv2.namedWindow(self.window_name, 0)
         # cv2.resizeWindow(self.window_name, 100, 100)
 
@@ -46,7 +46,7 @@ class ObjectRecognizer(object):
             # Object recognition
             if(self.classfier):
                 faceRects = self.classfier.detectMultiScale(
-                    grey, scaleFactor=1.3, minNeighbors=3, minSize=(200, 200))
+                    grey, scaleFactor=1.3, minNeighbors=3, minSize=(150, 150))
             else:
                 faceRects = []
 
@@ -85,12 +85,11 @@ class ObjectRecognizer(object):
         if classfier == 'face':
             self.classfier = self.faceClassfier
         elif classfier == 'bread':
-            print('aa')
             self.classfier = self.breadClassfier
 
 
 if __name__ == '__main__':
     # 0 for original camera, 1 for webcam
     detector = ObjectRecognizer(
-        'ObjectRecognition', 0, '/dev/cu.usbmodem14131')
-    detector.CatchUsbVideo()
+        'ObjectRecognition', 1, '/dev/cu.usbmodem14141')
+    detector.catchUsbVideo()

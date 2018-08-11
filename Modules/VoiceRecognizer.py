@@ -11,15 +11,17 @@
 import wave
 import pyaudio
 import nltk
+import serial
 from time import sleep
 from os import remove
 from aip import AipSpeech
 import numpy as np
+import speech_recognition as sr
 
 
 class VoiceRecognizer(object):
 
-    def __init__(self):
+    def __init__(self, port):
         self.APP_ID = '11615546'
         self.API_KEY = 'Agl9OnFc63ssaEXQGLvkop7c'
         self.SECRET_KEY = 'm206FgGobfv5jmdXTMnHtAY7kZ3gG8EH'
@@ -36,6 +38,8 @@ class VoiceRecognizer(object):
         self.NN_IGNORE_LIST = ['piece', 'cup',
                                'bottle', 'bar', 'spoon', 'bowl', 'oh']
 
+        self.ser = serial.Serial(port, 9600)
+
     def get_file_content(self, filePath):
         with open(filePath, 'rb') as fp:
             return fp.read()
@@ -44,12 +48,16 @@ class VoiceRecognizer(object):
     def recognize(self):
         # Recognize voice via Baidu API
         try:
-            res = self.client.asr(self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
-                'dev_pid': 1737,
-            })
+            # res = self.client.asr(self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
+            #     'dev_pid': 1737,
+            # })
+            r = sr.Recognizer()
+            audio_data = sr.AudioData(self.WAVE_OUTPUT_FILENAME, 16000, 1)
+            res = r.recognize_sphinx(audio_data)
         except:
-            print('Error: 404 Not Found\n')
-            return False
+            r = sr.Recognizer()
+            audio_data = sr.AudioData(self.WAVE_OUTPUT_FILENAME, 16000, 1)
+            res = r.recognize_sphinx(audio_data)
 
         # Remove temp wav file
         remove(self.WAVE_OUTPUT_FILENAME)
@@ -92,7 +100,7 @@ class VoiceRecognizer(object):
             test_data = stream.read(self.CHUNK)
             noise_data = np.fromstring(test_data, dtype=np.short)
             noise = np.max(noise_data)
-            if(noise < 1500):
+            if(noise < 2000):
                 print('noise:', noise, 'db\n')
                 break
             else:
@@ -148,9 +156,11 @@ class VoiceRecognizer(object):
                 res = self.recognize()
 
                 if res == 'bread':
-                    return res
+                    self.ser.write('o'.encode())
+                elif res == 'hello':
+                    self.ser.write('h'.encode())
 
 
 if __name__ == '__main__':
-    detector = VoiceRecognizer()
+    detector = VoiceRecognizer('/dev/cu.usbmodem14141')
     detector.monitor()
