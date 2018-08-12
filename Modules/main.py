@@ -2,27 +2,24 @@
 # -*- coding: utf-8 -*-
 
 # ********************************************
-# Main programme v1
+# Main programme v2
 # for feeding robot arm
 # By Ye Liu
 # Aug 10 2018
 # ********************************************
 
 import os
-from VoiceRecognizer import VoiceRecognizer
-from ObjectRecognizer import ObjectRecognizer
-from Printer import Printer
 
 # Set serial port
 port = '/dev/cu.usbmodem14131'
 
-# printer = Printer(port)
+with open('/Volumes/Data/Git/Feeding-Robot-Demo/Modules/queue.txt', 'w') as f:
+    f.truncate()
 
 pid = os.fork()
 if pid:
-    voiceRecognizer = VoiceRecognizer()
-    voiceRecognizer.monitor()
+    os.execlp('python3', 'python3',
+              '/Volumes/Data/Git/Feeding-Robot-Demo/Modules/ObjectRecognizer.py')
 else:
-    objectRecognizer = ObjectRecognizer(
-        'ObjectRecognition', 0, port)
-    objectRecognizer.catchUsbVideo()
+    os.execlp('python3', 'python3',
+              '/Volumes/Data/Git/Feeding-Robot-Demo/Modules/VoiceRecognizer.py')

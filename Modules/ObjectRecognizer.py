@@ -10,6 +10,7 @@
 
 import cv2
 import serial
+from time import sleep
 
 
 class ObjectRecognizer(object):
@@ -21,10 +22,10 @@ class ObjectRecognizer(object):
         self.camera_idx = camera_idx
 
         self.faceClassfier = cv2.CascadeClassifier(
-            "/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml")
+            '/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml')
         self.breadClassfier = cv2.CascadeClassifier(
-            "/Volumes/Data/CNN/data/cascade.xml")
-        self.classfier = self.faceClassfier
+            '/Volumes/Data/Git/cascade.xml')
+        self.classifier = self.faceClassfier
 
         self.ser = serial.Serial(port, 9600)
 
@@ -33,6 +34,7 @@ class ObjectRecognizer(object):
         # cv2.resizeWindow(self.window_name, 100, 100)
 
         cap = cv2.VideoCapture(self.camera_idx)
+        count = 0
 
         while cap.isOpened():
             ok, frame = cap.read()
@@ -43,35 +45,61 @@ class ObjectRecognizer(object):
             # Create gray level image
             grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
+            with open('queue.txt', 'r+') as f:
+                # Read command from file
+                command = f.read()
+
+                if command:
+                    # Change classifier
+                    if command == 'bread':
+                        self.classifier = self.breadClassfier
+                    else:
+                        self.classifier = self.faceClassfier
+
+                    # Clear temp file
+                    f.seek(0, 0)
+                    f.truncate()
+
             # Object recognition
-            if(self.classfier):
-                faceRects = self.classfier.detectMultiScale(
-                    grey, scaleFactor=1.3, minNeighbors=3, minSize=(150, 150))
-            else:
-                faceRects = []
+            if self.classifier:
+                faceRects = self.classifier.detectMultiScale(
+                    grey, scaleFactor=1.1, minNeighbors=3, minSize=(150, 150))
 
-            if len(faceRects):
-                (x, y, w, h) = faceRects[0]
-                center_x = int(x + w / 2)
-                center_y = int(y + h / 2)
+                if len(faceRects):
+                    (x, y, w, h) = faceRects[0]
+                    center_x = int(x + w / 2)
+                    center_y = int(y + h / 2)
 
-                # Send serial data
-                coordinate = 'c' + str(center_x) + ',' + str(center_y) + 'q'
-                self.ser.write(coordinate.encode())
-                # print('Send:', coordinate)
+                    if self.classifier == self.breadClassfier:
+                        if center_x > 570 and center_x < 700:
+                            count += 1
+                            if count >= 20:
+                                self.ser.write('p'.encode())
+                                sleep(2)
+                                self.ser.write('g'.encode())
+                                sleep(2)
+                                self.classifier = self.faceClassfier
+                        else:
+                            count = 0
 
-                # Receive serial data
-                # res = self.ser.readline()
-                # print('Receive:', res.decode())
+                    # Send serial data
+                    coordinate = 'c' + str(center_x) + \
+                        ',' + str(center_y) + 'q'
+                    self.ser.write(coordinate.encode())
+                    # print('Send:', coordinate)
 
-                cv2.putText(frame, '(%d,%d)' % (center_x, center_y),
-                            (10, 30), self.font, 1, (255, 0, 255), 3)
+                    # Receive serial data
+                    # res = self.ser.readline()
+                    # print('Receive:', res.decode())
 
-                cv2.rectangle(frame, (x - 10, y - 10),
-                              (x + w + 10, y + h + 10), self.color, 2)
+                    cv2.putText(frame, '(%d,%d)' % (center_x, center_y),
+                                (10, 30), self.font, 1, (255, 0, 255), 3)
 
-                cv2.putText(frame, 'Size: %d%%' % int(
-                    100 * h / frame.shape[0]), (x + 5, y + 30), self.font, 1, (255, 0, 255), 3)
+                    cv2.rectangle(frame, (x - 10, y - 10),
+                                  (x + w + 10, y + h + 10), self.color, 2)
+
+                    cv2.putText(frame, 'Size: %d%%' % int(
+                        100 * h / frame.shape[0]), (x + 5, y + 30), self.font, 1, (255, 0, 255), 3)
 
             # Show image
             cv2.imshow(self.window_name, frame)
@@ -81,11 +109,11 @@ class ObjectRecognizer(object):
         cap.release()
         cv2.destroyAllWindows()
 
-    def switchClassfier(self, classfier):
-        if classfier == 'face':
-            self.classfier = self.faceClassfier
-        elif classfier == 'bread':
-            self.classfier = self.breadClassfier
+    def switchClassfier(self, classifier):
+        if classifier == 'face':
+            self.classifier = self.faceClassfier
+        elif classifier == 'bread':
+            self.classifier = self.breadClassfier
 
 
 if __name__ == '__main__':

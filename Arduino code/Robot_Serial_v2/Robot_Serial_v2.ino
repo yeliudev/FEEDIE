@@ -87,8 +87,8 @@ void prepare()
   for (pos = 0; pos <= speed; pos++)
   {
     servoA.write(int(map(pos, 0, speed, currentA, 105)));
-    servoB.write(int(map(pos, 0, speed, currentB, 50)));
-    servoC.write(int(map(pos, 0, speed, currentC, 165)));
+    servoB.write(int(map(pos, 0, speed, currentB, 40)));
+    servoC.write(int(map(pos, 0, speed, currentC, 168)));
     servoD.write(int(map(pos, 0, speed, currentD, WRIST_Y_DEFAULT)));
     servoE.write(int(map(pos, 0, speed, currentE, WRIST_Z_DEFAULT)));
     servoG.write(int(map(pos, 0, speed, currentG, CRAW_DEFAULT)));
@@ -106,9 +106,9 @@ void catchFood()
   speed = 200; // Lower is faster
   for (pos = 0; pos <= speed; pos++)
   {
-    servoA.write(int(map(pos, 0, speed, currentA, 60)));
+    servoA.write(int(map(pos, 0, speed, currentA, 70)));
     servoB.write(int(map(pos, 0, speed, currentB, 35)));
-    servoC.write(int(map(pos, 0, speed, currentC, 115)));
+    servoC.write(int(map(pos, 0, speed, currentC, 130)));
     servoG.write(int(map(pos, 0, speed, currentG, CRAW_DEFAULT)));
     delay(5);
   }
@@ -130,7 +130,7 @@ void refresh()
 
 void sayHello()
 {
-  servoReset(ELBOW_DEFAULT, SHOULDER_DEFAULT, WRIST_X_DEFAULT, WRIST_Y_DEFAULT, WRIST_Z_DEFAULT, 130, CRAW_DEFAULT, 80);
+  servoReset(ELBOW_DEFAULT, SHOULDER_DEFAULT, WRIST_X_DEFAULT, WRIST_Y_DEFAULT, WRIST_Z_DEFAULT, 130, CRAW_DEFAULT, 100);
   servoC.write(180);
   for (int i = 85; i >= 35; i--)
   {
@@ -166,7 +166,7 @@ void trackObject(int x, int y)
   {
     // Turn left
     int base = servoF.read();
-    double delta = 10 * atan((CLIENT_MIDDLE_X - x) / 1600.0);
+    double delta = 180 / PI * atan((CLIENT_MIDDLE_X - x) / 4000.0);
     Serial.println("Turn " + String(delta) + "° left");
     servoF.write(base + delta);
   }
@@ -174,7 +174,7 @@ void trackObject(int x, int y)
   {
     // Turn right
     int base = servoF.read();
-    double delta = 10 * atan((x - CLIENT_MIDDLE_X) / 1600.0);
+    double delta = 180 / PI * atan((x - CLIENT_MIDDLE_X) / 4000.0);
     Serial.println("Turn " + String(delta) + "° right");
     servoF.write(base - delta);
   }
@@ -182,7 +182,7 @@ void trackObject(int x, int y)
   {
     // Turn up
     int elbow = servoA.read();
-    double delta = 10 * atan((CLIENT_MIDDLE_Y - y) / 1600.0);
+    double delta = 180 / PI * atan((CLIENT_MIDDLE_Y - y) / 8000.0);
     Serial.println("Turn " + String(delta) + "° up");
     servoA.write(elbow - delta);
   }
@@ -190,7 +190,7 @@ void trackObject(int x, int y)
   {
     // Turn down
     int elbow = servoA.read();
-    double delta = 10 * atan((y - CLIENT_MIDDLE_Y) / 1600.0);
+    double delta = 180 / PI * atan((y - CLIENT_MIDDLE_Y) / 8000.0);
     Serial.println("Turn " + String(delta) + "° down");
     servoA.write(elbow + delta);
   }

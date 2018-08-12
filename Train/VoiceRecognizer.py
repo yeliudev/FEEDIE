@@ -33,12 +33,12 @@ class VoiceRecognizer(object):
         self.RATE = 16000
         self.CHANNELS = 1
         self.RECORD_SECONDS = 1
-        self.WAVE_OUTPUT_FILENAME = 'output.wav'
+        self.WAVE_OUTPUT_FILENAME = 'HELLO'
 
         self.NN_IGNORE_LIST = ['piece', 'cup',
                                'bottle', 'bar', 'spoon', 'bowl', 'oh']
 
-        self.ser = serial.Serial(port, 9600)
+        # self.ser = serial.Serial(port, 9600)
 
     def get_file_content(self, filePath):
         with open(filePath, 'rb') as fp:
@@ -46,23 +46,27 @@ class VoiceRecognizer(object):
 
     # Return keywords of the speech
     def recognize(self):
-        # Recognize voice via Baidu or Sphinx API
+        # Recognize voice via Baidu API
         try:
-            res = self.client.asr(self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
-                'dev_pid': 1737,
-            })
-        except:
+            # res = self.client.asr(self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
+            #     'dev_pid': 1737,
+            # })
             r = sr.Recognizer()
             audio_file = sr.AudioFile(self.WAVE_OUTPUT_FILENAME)
             with audio_file as source:
                 audio_data = r.record(source)
-            res = {'err_no': 0, 'result': r.recognize_sphinx(audio_data)}
+            res = r.recognize_sphinx(audio_data)
+        except:
+            r = sr.Recognizer()
+            audio_file = sr.AudioFile(self.WAVE_OUTPUT_FILENAME)
+            audio_data = sr.AudioData(audio_file, 16000, 1)
+            res = r.recognize_sphinx(audio_data)
 
         # Remove temp wav file
         remove(self.WAVE_OUTPUT_FILENAME)
 
-        if res['err_no'] == 0:
-            # print('Result:', res['result'][0])
+        if True:
+            print('Result:', res)
 
             words = nltk.word_tokenize(str(res['result'][0]))
             tagged_words = nltk.pos_tag(words)
@@ -87,6 +91,7 @@ class VoiceRecognizer(object):
     def monitor(self):
         print('* testing noise')
         sleep(1)
+        count = 31
 
         p = pyaudio.PyAudio()
         stream = p.open(format=self.FORMAT,
@@ -145,24 +150,14 @@ class VoiceRecognizer(object):
                 frames.clear()
                 index = -1
 
-                wf = wave.open(self.WAVE_OUTPUT_FILENAME, 'wb')
+                wf = wave.open(self.WAVE_OUTPUT_FILENAME +
+                               str(count) + '.wav', 'wb')
                 wf.setnchannels(self.CHANNELS)
                 wf.setsampwidth(p.get_sample_size(self.FORMAT))
                 wf.setframerate(self.RATE)
                 wf.writeframes(b''.join(rec))
                 wf.close()
-
-                res = self.recognize()
-
-                if res == 'bread':
-                    # Send 'object' message
-                    self.ser.write('o'.encode())
-                    # Switch classifier
-                    with open('queue.txt', 'w') as f:
-                        f.write('bread')
-                elif res == 'hello':
-                    # Send 'hello' message
-                    self.ser.write('h'.encode())
+                count += 1
 
 
 if __name__ == '__main__':
