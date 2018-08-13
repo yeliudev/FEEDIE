@@ -166,5 +166,5 @@ class VoiceRecognizer(object):
 
 
 if __name__ == '__main__':
-    detector = VoiceRecognizer('/dev/cu.usbmodem14141')
+    detector = VoiceRecognizer('/dev/cu.usbmodem14341')
     detector.monitor()

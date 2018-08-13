@@ -120,5 +120,5 @@ class ObjectRecognizer(object):
 if __name__ == '__main__':
     # 0 for original camera, 1 for webcam
     detector = ObjectRecognizer(
-        'ObjectRecognition', 1, '/dev/cu.usbmodem14141')
+        'ObjectRecognition', 0, '/dev/cu.usbmodem14341')
     detector.catchUsbVideo()
