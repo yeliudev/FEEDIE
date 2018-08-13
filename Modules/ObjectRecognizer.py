@@ -53,7 +53,6 @@ class ObjectRecognizer(object):
                     # Change classifier
                     if command == 'bread':
                         self.classifier = self.breadClassfier
-                        print('bread')
                     else:
                         self.classifier = self.faceClassfier
 

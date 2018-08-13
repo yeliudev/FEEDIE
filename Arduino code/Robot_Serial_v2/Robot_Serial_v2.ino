@@ -20,7 +20,7 @@
 #define WRIST_X_DEFAULT 85
 
 #define WRIST_Y_MIN 0
-#define WRIST_Y_MAX 90
+#define WRIST_Y_MAX 180
 #define WRIST_Y_DEFAULT 90
 
 #define WRIST_Z_MIN 0
