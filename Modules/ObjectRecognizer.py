@@ -24,7 +24,7 @@ class ObjectRecognizer(object):
         self.faceClassfier = cv2.CascadeClassifier(
             '/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml')
         self.breadClassfier = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/cascade.xml')
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Modules/cascade_bread_11stages.xml')
         self.classifier = self.faceClassfier
 
         self.ser = serial.Serial(port, 9600)
@@ -45,7 +45,7 @@ class ObjectRecognizer(object):
             # Create gray level image
             grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            with open('queue.txt', 'r+') as f:
+            with open('/Volumes/Data/Git/Feeding-Robot-Demo/Modules/queue.txt', 'r+') as f:
                 # Read command from file
                 command = f.read()
 
@@ -53,6 +53,7 @@ class ObjectRecognizer(object):
                     # Change classifier
                     if command == 'bread':
                         self.classifier = self.breadClassfier
+                        print('bread')
                     else:
                         self.classifier = self.faceClassfier
 

@@ -158,7 +158,7 @@ class VoiceRecognizer(object):
                     # Send 'object' message
                     self.ser.write('o'.encode())
                     # Switch classifier
-                    with open('queue.txt', 'w') as f:
+                    with open('/Volumes/Data/Git/Feeding-Robot-Demo/Modules/queue.txt', 'w') as f:
                         f.write('bread')
                 elif res == 'hello':
                     # Send 'hello' message

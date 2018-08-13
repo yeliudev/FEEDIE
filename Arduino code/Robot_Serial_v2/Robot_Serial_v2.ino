@@ -88,7 +88,7 @@ void prepare()
   {
     servoA.write(int(map(pos, 0, speed, currentA, 105)));
     servoB.write(int(map(pos, 0, speed, currentB, 40)));
-    servoC.write(int(map(pos, 0, speed, currentC, 168)));
+    servoC.write(int(map(pos, 0, speed, currentC, 170)));
     servoD.write(int(map(pos, 0, speed, currentD, WRIST_Y_DEFAULT)));
     servoE.write(int(map(pos, 0, speed, currentE, WRIST_Z_DEFAULT)));
     servoG.write(int(map(pos, 0, speed, currentG, CRAW_DEFAULT)));

@@ -1,0 +1,136 @@
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.wrapper {
+    text-align: center;
+    background-image: radial-gradient(ellipse closest-side at 50% 50%, #3c3e48, #363841 25%, #2b2c34);
+    background-repeat: no-repeat;
+    background-size: 100% 1020px;
+    background-position: center -120px;
+    width: 1425px;
+    height: 900px;
+    overflow: hidden
+}
+
+.output {
+    font-size: 2.3em;
+    letter-spacing: 0.05em;
+    color: #dcf0ff;
+    font-weight: 250;
+    border-style: none;
+    outline: medium;
+    text-align: center;
+    position: relative;
+    right: -15px;
+    bottom: -280px;
+    width: 1425px;
+    margin-left: auto;
+    margin-right: auto
+}
+
+.welcome-button {
+    display: inline-block;
+    padding: .7em 3em;
+    line-height: inherit;
+    font-size: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 5px;
+    color: #343233;
+    background-color: #ffd152;
+    position: absolute;
+    bottom: 100px;
+    left: 654px;
+}
+
+.welcome-button:hover {
+    cursor: pointer;
+    color: #343233;
+    background-color: #ffc31f
+}
+
+.welcome-button:active {
+    color: #343233;
+    background-color: #ebac00;
+    transform: translateY(2px)
+}
+
+.voice-input {
+    font-size: 3em;
+    letter-spacing: 0.05em;
+    background-color: transparent;
+    color: transparent;
+    text-shadow: 0 0 0 #dcf0ff;
+    font-weight: 250;
+    border-style: none;
+    outline: medium;
+    text-align: center;
+    width: 1000px;
+    position: absolute;
+    left: 220px;
+    bottom: 100px
+}
+
+.hero-logo-circles {
+    position: absolute;
+    left: 450px;
+    top: 70px
+}
+
+.hero-logo-circle {
+    width: 550px;
+    height: 550px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    animation: hero-logo-circle 1s linear infinite;
+    will-change: transform
+}
+
+.hero-logo-circle:nth-child(1) {
+    animation-duration: 30s
+}
+
+.hero-logo-circle:nth-child(2) {
+    animation-duration: 40s
+}
+
+.hero-logo-circle:nth-child(3) {
+    animation-duration: 50s
+}
+
+.hero-logo-circle:nth-child(4) {
+    animation-duration: 60s
+}
+
+.hero-logo-circle:nth-child(5) {
+    animation-duration: 70s
+}
+
+.hero-logo-circle:nth-child(6) {
+    animation-duration: 80s
+}
+
+.hero-logo-circle:nth-child(7) {
+    animation-duration: 90s
+}
+
+.hero-logo-circle:nth-child(8) {
+    animation-duration: 100s
+}
+
+.hero-logo-circle:nth-child(9) {
+    animation-duration: 110s
+}
+
+.hero-logo-circle:nth-child(10) {
+    animation-duration: 120s
+}
+
+@keyframes hero-logo-circle {
+    100% {
+        transform: rotate(1turn)
+    }
+}
