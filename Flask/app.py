@@ -1,15 +1,33 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# ********************************************
+# User Interface Model v1
+# for feeding robot arm
+# By Ye Liu
+# Aug 14 2018
+# ********************************************
+
 import cv2
 import nltk
 import serial
+import pyautogui as pag
+from time import sleep
+from redis import StrictRedis
 from flask import Flask, render_template, Response, request, jsonify
 
 
-ser = serial.Serial('/dev/cu.usbmodem14341', 9600)
+# ser = serial.Serial('/dev/cu.usbmodem14341', 9600)
+
+# Redis initialization
+redis = StrictRedis(host='localhost', port=6379, db=0)
+redis.set('count', '0')
+redis.set('classifier', '')
 
 
 class VideoCamera(object):
     def __init__(self):
-        self.video = cv2.VideoCapture(1)
+        self.video = cv2.VideoCapture(0)
 
         self.color = (0, 255, 0)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
@@ -32,20 +50,14 @@ class VideoCamera(object):
         # Create gray level image
         grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        with open('/Volumes/Data/Git/Feeding-Robot-Demo/Modules/queue.txt', 'r+') as f:
-            # Read command from file
-            command = f.read()
+        # Read command from redis
+        command = redis.get('classifier')
 
-            if command:
-                # Change classifier
-                if command == 'bread':
-                    self.classifier = self.breadClassfier
-                else:
-                    self.classifier = self.faceClassfier
-
-                # Clear temp file
-                f.seek(0, 0)
-                f.truncate()
+        # Change classifier
+        if command == b'bread':
+            self.classifier = self.breadClassfier
+        else:
+            self.classifier = self.faceClassfier
 
         # Object recognition
         if self.classifier:
@@ -57,9 +69,38 @@ class VideoCamera(object):
                 center_x = int(x + w / 2)
                 center_y = int(y + h / 2)
 
+                if command == b'bread':
+                    if center_x > 570 and center_x < 700:
+                        count = int(redis.get('count'))
+                        count += 1
+                        if count >= 20:
+                            # Send pick message
+                            self.ser.write('p'.encode())
+                            sleep(1.5)
+                            self.ser.write('g'.encode())
+                            # Switch back to face classifier
+                            redis.set('classifier', 'feed')
+                        else:
+                            redis.set('count', str(count))
+                    else:
+                        redis.set('count', '0')
+                elif command == b'feed':
+                    if center_x > 570 and center_x < 700 and center_y > 410 and center_y < 530:
+                        count = int(redis.get('count'))
+                        count += 1
+                        if count >= 15:
+                            # Send feed message
+                            self.ser.write('e'.encode())
+                            # Switch back to face classifier
+                            redis.set('classifier', '')
+                        else:
+                            redis.set('count', str(count))
+                    else:
+                        redis.set('count', '0')
+
                 # Send serial data
-                coordinate = 'c' + str(center_x) + ',' + str(center_y) + 'q'
-                ser.write(coordinate.encode())
+                # coordinate = 'c' + str(center_x) + ',' + str(center_y) + 'q'
+                # ser.write(coordinate.encode())
                 # print('Send:', coordinate)
 
                 # Receive serial data
@@ -97,33 +138,54 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-@app.route('/app_get', methods=['GET'])
-def app_get():
+@app.route('/app_init')
+def app_init():
+    redis.set('status', '')
+    return 'Success'
+
+
+@app.route('/start_recording', methods=['GET'])
+def start_recording():
+    recording = redis.get('status')
+    print(recording)
+    if not recording:
+        pag.hotkey('ctrlleft', 'shiftleft', 'q')
+        redis.set('status', 'recording')
+    return 'Success'
+
+
+@app.route('/speech_recognition', methods=['GET'])
+def speech_recognition():
     input = request.args.get('input')
 
     words = nltk.word_tokenize(input)
     tagged_words = nltk.pos_tag(words)
 
     for item in tagged_words:
-        if item[1] == 'NN' and item[0] in ['bread', 'breath', 'crap', 'crab']:
+        if item[0] == 'bread':
             print('Keyword: bread\n')
 
+            recording = redis.get('status')
+            if recording:
+                pag.hotkey('ctrlleft', 'shiftleft', 'q')
+                redis.set('status', '')
+
             # Send 'object' message
-            ser.write('o'.encode())
+            # ser.write('o'.encode())
+
             # Switch classifier
-            with open('/Volumes/Data/Git/Feeding-Robot-Demo/Modules/queue.txt', 'w') as f:
-                f.write('bread')
+            redis.set('classifier', 'bread')
 
             return jsonify({'keyword': 'bread'})
 
     for item in tagged_words:
         if item[1] == 'NN' and item[0] not in ['piece', 'cup',
-                                               'bottle', 'bar', 'spoon', 'bowl', 'oh']:
+                                               'bottle', 'bar', 'spoon', 'bowl', 'oh', 'please']:
             print('Keyword:', item[0], '\n')
 
-            if item[0] == 'hello':
-                # Send 'hello' message
-                ser.write('h'.encode())
+            # if item[0] == 'hello':
+            #     # Send 'hello' message
+            #     ser.write('h'.encode())
 
             return jsonify({'keyword': item[0]})
 

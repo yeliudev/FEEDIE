@@ -21,7 +21,32 @@
       overflow: hidden
     }
 
+    .flipper {
+      transition: 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .front .back {
+      width: 400px;
+      height: 400px;
+      border-radius: 100%;
+      position: fixed;
+      top: 170px;
+      left: 526px;
+      object-fit: cover
+    }
+
+    .logo {
+      width: 350px;
+      height: 350px;
+      position: fixed;
+      top: 195px;
+      left: 550px;
+      object-fit: scale-down
+    }
+
     .output {
+      backface-visibility: hidden;
       font-size: 2.3em;
       letter-spacing: 0.05em;
       color: #dcf0ff;
@@ -30,21 +55,23 @@
       outline: medium;
       text-align: center;
       position: relative;
-      right: -15px;
-      bottom: -310px;
+      right: -8px;
+      bottom: -315px;
       width: 1425px;
       margin-left: auto;
       margin-right: auto
     }
 
     .video {
-      width: 350px;
-      height: 350px;
+      backface-visibility: hidden;
+      width: 400px;
+      height: 400px;
       border-radius: 100%;
       position: fixed;
-      top: 170px;
-      left: 550px;
-      object-fit: cover
+      top: 145px;
+      left: 515px;
+      object-fit: cover;
+      transform: rotateY(180deg)
     }
 
     .welcome-button {
@@ -155,23 +182,46 @@
   <script>
     'use strict';
 
-    var input = '',
+    var id = '',
+      input = '',
       flag = false,
-      command = ['hello', 'bread']
+      count = 0,
+      food = ['bread', 'water']
+
+    function onInit() {
+      $.ajax({
+        type: 'GET',
+        url: '{{ url_for("app_init") }}',
+        success: function (res) {
+          if (res === 'Success') {
+            console.log('App init successfully')
+          }
+        }
+      })
+    }
 
     function onStartClick() {
-      // Display input
+      // Display input box
       document.getElementById('input-box').style.display = ''
       document.getElementById('start-button').style.display = 'none'
-      //document.getElementById('output').style.display = 'none'
-      //document.getElementById('video').style.display = ''
+      document.getElementById('output').style.display = ''
+      document.getElementById('logo').style.display = 'none'
+      document.getElementById('input-box').focus()
+
+      // Request for voice recognition
+      $.ajax({
+        type: 'GET',
+        url: '{{ url_for("start_recording") }}',
+        fail: function (err) {
+          document.getElementById('output').innerHTML = 'Error'
+        }
+      })
 
       // Set interval
-      var timeout = setInterval('checkInput()', 800)
+      id = setInterval('checkInput()', 800)
     }
 
     function checkInput() {
-      console.log('check')
       var newInput = document.getElementById('input-box').value
       if (newInput) {
         if (newInput === input) {
@@ -184,21 +234,37 @@
             // Request for keyword
             $.ajax({
               type: 'GET',
-              url: '{{ url_for("app_get") }}',
+              url: '{{ url_for("speech_recognition") }}',
               data: data,
               dataType: 'json',
               success: function (res) {
-                if (command.indexOf(res['keyword']) != -1) {
+                if (res['keyword'] === 'hello' || res['keyword'] === 'Hello') {
+                  document.getElementById('output').innerHTML = 'Hello~'
+                  document.getElementById('input-box').value = ''
+                  count = 0
+                } else if (food.indexOf(res['keyword']) != -1) {
                   document.getElementById('output').innerHTML = 'Keyword: ' + res['keyword']
+                  document.getElementById('input-box').value = ''
+                  count = 0
+                  setTimeout('switch2Video("' + res['keyword'] + '")', 2000)
+                } else if (res['keyword']) {
+                  document.getElementById('output').innerHTML = 'Sorry but what is ' + res['keyword'] + '?'
+                  document.getElementById('input-box').value = ''
+                  count = 0
                 } else {
                   document.getElementById('output').innerHTML = "Sorry, I don't understand"
+                  count++
+                  if (count >= 3) {
+                    document.getElementById('input-box').value = ''
+                    count = 0
+                  }
                 }
                 input = ''
               },
               fail: function (err) {
                 document.getElementById('output').innerHTML = 'Error'
               }
-            });
+            })
 
             flag = false
           } else {
@@ -209,13 +275,26 @@
         }
       }
     }
+
+    function switch2Video(object) {
+      document.getElementById('input-box').value = 'Searching for ' + object
+      document.getElementById('flipper').style.transform = 'rotateY(180deg)'
+      clearInterval(id)
+    }
   </script>
 </head>
 
-<body>
+<body onload="onInit()">
   <div class="wrapper">
-    <h1 id="output" class="output">FEEDIE</h1>
-    <img id="video" class="video" src="{{ url_for('video_feed') }}" style="display: none;" />
+    <div id="flipper" class="flipper">
+      <div class="front">
+        <img id="logo" class="logo" src="https://i.loli.net/2018/08/14/5b71fd5dc2af9.png" />
+        <h1 id="output" class="output" style="display: none;">How can I help you?</h1>
+      </div>
+      <div class="back">
+        <img id="video" class="video" src="{{ url_for('video_feed') }}" />
+      </div>
+    </div>
     <div class="hero-logo-circles">
       <img class="hero-logo-circle" src="https://github-atom-io-herokuapp-com.global.ssl.fastly.net/assets/index-portal-red-semi-085b4e44d49b2ffe935cc1b2b3094ce8.svg"
       />

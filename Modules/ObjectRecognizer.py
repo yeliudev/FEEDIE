@@ -27,7 +27,7 @@ class ObjectRecognizer(object):
             '/Volumes/Data/Git/Feeding-Robot-Demo/Modules/cascade_bread_11stages.xml')
         self.classifier = self.faceClassfier
 
-        self.ser = serial.Serial(port, 9600)
+        # self.ser = serial.Serial(port, 9600)
 
     def catchUsbVideo(self):
         cv2.namedWindow(self.window_name, 0)
@@ -83,9 +83,9 @@ class ObjectRecognizer(object):
                             count = 0
 
                     # Send serial data
-                    coordinate = 'c' + str(center_x) + \
-                        ',' + str(center_y) + 'q'
-                    self.ser.write(coordinate.encode())
+                    # coordinate = 'c' + str(center_x) + \
+                    #     ',' + str(center_y) + 'q'
+                    # self.ser.write(coordinate.encode())
                     # print('Send:', coordinate)
 
                     # Receive serial data
