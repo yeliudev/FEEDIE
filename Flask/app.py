@@ -12,13 +12,14 @@ import cv2
 import nltk
 import serial
 import pyautogui as pag
+from time import sleep
 from redis import StrictRedis
 from flask import Flask, render_template, Response, request, jsonify
 
 
 # ser = serial.Serial('/dev/cu.usbmodem14341', 9600)
 
-# Redis initialization
+# Redis initialization (run 'redis-server /usr/local/etc/redis.conf' first)
 redis = StrictRedis(host='localhost', port=6379, db=0)
 redis.set('count', '0')
 redis.set('classifier', '')
@@ -72,9 +73,9 @@ class VideoCamera(object):
                     if center_x > 570 and center_x < 700:
                         count = int(redis.get('count'))
                         count += 1
-                        if count >= 20:
+                        if count >= 15:
                             # Send pick message
-                            self.ser.write('p'.encode())
+                            # self.ser.write('p'.encode())
                             # Switch back to face classifier
                             redis.set('classifier', 'feed')
                         else:
@@ -87,9 +88,14 @@ class VideoCamera(object):
                         count += 1
                         if count >= 15:
                             # Send feed message
-                            self.ser.write('e'.encode())
+                            # self.ser.write('e'.encode())
                             # Switch back to face classifier
                             redis.set('classifier', '')
+
+                            recording = redis.get('status')
+                            if not recording:
+                                pag.hotkey('ctrlleft', 'shiftleft', 'q')
+                                redis.set('status', 'recording')
                         else:
                             redis.set('count', str(count))
                     else:
@@ -143,19 +149,12 @@ def app_init():
 
 @app.route('/status')
 def status():
-    status = redis.get('classifier')
-    if not status:
-        return 'Searching for face'
-    elif status == 'feed':
-        return 'Feeding'
-    else:
-        return ''
+    return redis.get('classifier')
 
 
 @app.route('/start_recording', methods=['GET'])
 def start_recording():
     recording = redis.get('status')
-    print(recording)
     if not recording:
         pag.hotkey('ctrlleft', 'shiftleft', 'q')
         redis.set('status', 'recording')
@@ -185,6 +184,13 @@ def speech_recognition():
             redis.set('classifier', 'bread')
 
             return jsonify({'keyword': 'bread'})
+        elif item[0] == 'Thank' or item[0] == 'thank':
+            print('Keyword: thank you\n')
+
+            # Send 'thank you' message
+            # ser.write('t'.encode())
+
+            return jsonify({'keyword': 'thank'})
 
     for item in tagged_words:
         if item[1] == 'NN' and item[0] not in ['piece', 'cup',

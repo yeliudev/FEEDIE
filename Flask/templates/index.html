@@ -238,21 +238,30 @@
               data: data,
               dataType: 'json',
               success: function (res) {
-                if (res['keyword'] === 'hello' || res['keyword'] === 'Hello') {
+                if (res['keyword'] === 'Hello' || res['keyword'] === 'hello') {
                   document.getElementById('output').innerHTML = 'Hello~'
+                  document.getElementById('flipper').style.transform = ''
+                  document.getElementById('input-box').value = ''
+                  count = 0
+                } else if (res['keyword'] === 'Thank' || res['keyword'] === 'thank') {
+                  document.getElementById('output').innerHTML = 'You are welcome~'
+                  document.getElementById('flipper').style.transform = ''
                   document.getElementById('input-box').value = ''
                   count = 0
                 } else if (food.indexOf(res['keyword']) != -1) {
-                  document.getElementById('output').innerHTML = 'Keyword: ' + res['keyword']
+                  document.getElementById('output').innerHTML = res['keyword'] === 'bread' ? 'Bread? Sure' : 'Water? Sure'
+                  document.getElementById('flipper').style.transform = ''
                   document.getElementById('input-box').value = ''
                   count = 0
-                  setTimeout('switch2Video("' + res['keyword'] + '")', 2000)
+                  setTimeout('switch2Video("' + res['keyword'] + '")', 1500)
                 } else if (res['keyword']) {
                   document.getElementById('output').innerHTML = 'Sorry but what is ' + res['keyword'] + '?'
+                  document.getElementById('flipper').style.transform = ''
                   document.getElementById('input-box').value = ''
                   count = 0
                 } else {
                   document.getElementById('output').innerHTML = "Sorry, I don't understand"
+                  document.getElementById('flipper').style.transform = ''
                   count++
                   if (count >= 3) {
                     document.getElementById('input-box').value = ''
@@ -280,7 +289,7 @@
       document.getElementById('input-box').value = 'Searching for ' + object
       document.getElementById('flipper').style.transform = 'rotateY(180deg)'
       clearInterval(id)
-      id = setInterval('checkStatus()', 10)
+      id = setInterval('checkStatus()', 100)
     }
 
     function checkStatus() {
@@ -288,8 +297,11 @@
         type: 'GET',
         url: '{{ url_for("status") }}',
         success: function (res) {
-          if (res) {
-            document.getElementById('input-box').value = res
+          console.log(res)
+          if (!res) {
+            document.getElementById('input-box').value = ''
+            clearInterval(id)
+            id = setInterval('checkInput()', 800)
           }
         }
       })
