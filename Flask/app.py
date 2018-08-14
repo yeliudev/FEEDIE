@@ -12,7 +12,6 @@ import cv2
 import nltk
 import serial
 import pyautogui as pag
-from time import sleep
 from redis import StrictRedis
 from flask import Flask, render_template, Response, request, jsonify
 
@@ -35,7 +34,7 @@ class VideoCamera(object):
         self.faceClassfier = cv2.CascadeClassifier(
             '/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml')
         self.breadClassfier = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Modules/cascade_bread_11stages.xml')
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_bread_11stages.xml')
         self.classifier = self.faceClassfier
 
     def __del__(self):
@@ -76,8 +75,6 @@ class VideoCamera(object):
                         if count >= 20:
                             # Send pick message
                             self.ser.write('p'.encode())
-                            sleep(1.5)
-                            self.ser.write('g'.encode())
                             # Switch back to face classifier
                             redis.set('classifier', 'feed')
                         else:
@@ -142,6 +139,17 @@ def video_feed():
 def app_init():
     redis.set('status', '')
     return 'Success'
+
+
+@app.route('/status')
+def status():
+    status = redis.get('classifier')
+    if not status:
+        return 'Searching for face'
+    elif status == 'feed':
+        return 'Feeding'
+    else:
+        return ''
 
 
 @app.route('/start_recording', methods=['GET'])

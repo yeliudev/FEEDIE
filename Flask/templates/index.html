@@ -280,6 +280,19 @@
       document.getElementById('input-box').value = 'Searching for ' + object
       document.getElementById('flipper').style.transform = 'rotateY(180deg)'
       clearInterval(id)
+      id = setInterval('checkStatus()', 10)
+    }
+
+    function checkStatus() {
+      $.ajax({
+        type: 'GET',
+        url: '{{ url_for("status") }}',
+        success: function (res) {
+          if (res) {
+            document.getElementById('input-box').value = res
+          }
+        }
+      })
     }
   </script>
 </head>

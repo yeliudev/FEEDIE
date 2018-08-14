@@ -74,7 +74,7 @@ void servoReset(int elbow = ELBOW_DEFAULT, int shoulder = SHOULDER_DEFAULT, int 
   }
 }
 
-void prepare()
+void pickFood()
 {
   currentA = servoA.read();
   currentB = servoB.read();
@@ -94,16 +94,13 @@ void prepare()
     servoG.write(int(map(pos, 0, speed, currentG, CRAW_DEFAULT)));
     delay(5);
   }
-}
+  delay(50);
 
-void catchFood()
-{
   currentA = servoA.read();
   currentB = servoB.read();
   currentC = servoC.read();
   currentG = servoG.read();
 
-  speed = 200; // Lower is faster
   for (pos = 0; pos <= speed; pos++)
   {
     servoA.write(int(map(pos, 0, speed, currentA, 70)));
@@ -113,12 +110,14 @@ void catchFood()
     delay(5);
   }
   delay(50);
+
   for (pos = 0; pos <= speed; pos++)
   {
     servoG.write(int(map(pos, 0, speed, CRAW_DEFAULT, 82)));
     delay(5);
   }
   delay(50);
+
   servoReset(ELBOW_DEFAULT, SHOULDER_DEFAULT, WRIST_X_DEFAULT, WRIST_Y_DEFAULT, WRIST_Z_DEFAULT, 130, 82, 200);
 }
 
@@ -210,7 +209,6 @@ void setup()
 
   servoReset();
   refresh();
-  // sayHello();
 }
 
 void loop()
@@ -232,37 +230,30 @@ void loop()
     */
     switch (buffer[0])
     {
-      case 'c':
-        // Parse coordinate data
-        comma = buffer.indexOf(',');
-        x = buffer.substring(1, comma).toInt();
-        y = buffer.substring(comma + 1).toInt();
-
-        // Track object
-        trackObject(x, y);
-
-        break;
-      case 'f':
-        servoReset(ELBOW_DEFAULT, SHOULDER_DEFAULT, WRIST_X_DEFAULT, WRIST_Y_DEFAULT, WRIST_Z_DEFAULT, 130, CRAW_DEFAULT, 100);
-        Serial.println("Turn towards face");
-        break;
-      case 'o':
-        servoReset(60, SHOULDER_DEFAULT, 110, WRIST_Y_DEFAULT, WRIST_Z_DEFAULT, 180, CRAW_DEFAULT, 150);
-        Serial.println("Turn towards food");
-        break;
-      case 'p':
-        prepare();
-        Serial.println("Prepare to catch food");
-        break;
-      case 'g':
-        catchFood();
-        Serial.println("Catch food");
-        break;
-      case 'h':
-        sayHello();
-        break;
+    case 'c':
+      // Parse coordinate data
+      comma = buffer.indexOf(',');
+      x = buffer.substring(1, comma).toInt();
+      y = buffer.substring(comma + 1).toInt();
+      // Track object
+      trackObject(x, y);
+      break;
+    case 'f':
+      servoReset(ELBOW_DEFAULT, SHOULDER_DEFAULT, WRIST_X_DEFAULT, WRIST_Y_DEFAULT, WRIST_Z_DEFAULT, 130, CRAW_DEFAULT, 100);
+      Serial.println("Turn towards face");
+      break;
+    case 'o':
+      servoReset(60, SHOULDER_DEFAULT, 110, WRIST_Y_DEFAULT, WRIST_Z_DEFAULT, 180, CRAW_DEFAULT, 150);
+      Serial.println("Turn towards food");
+      break;
+    case 'p':
+      pickFood();
+      Serial.println("Pick food");
+      break;
+    case 'h':
+      sayHello();
+      break;
     }
-
     refresh();
   }
 }
