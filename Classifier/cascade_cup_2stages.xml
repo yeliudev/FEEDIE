@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<cascade>
+  <stageType>BOOST</stageType>
+  <featureType>HAAR</featureType>
+  <height>40</height>
+  <width>40</width>
+  <stageParams>
+    <boostType>GAB</boostType>
+    <minHitRate>9.9000000953674316e-01</minHitRate>
+    <maxFalseAlarm>5.0000000000000000e-01</maxFalseAlarm>
+    <weightTrimRate>9.4999999999999996e-01</weightTrimRate>
+    <maxDepth>1</maxDepth>
+    <maxWeakCount>100</maxWeakCount></stageParams>
+  <featureParams>
+    <maxCatCount>0</maxCatCount>
+    <featSize>1</featSize>
+    <mode>ALL</mode></featureParams>
+  <stageNum>2</stageNum>
+  <stages>
+    <!-- stage 0 -->
+    <_>
+      <maxWeakCount>1</maxWeakCount>
+      <stageThreshold>9.9000000953674316e-01</stageThreshold>
+      <weakClassifiers>
+        <_>
+          <internalNodes>
+            0 -1 0 -7.9335153102874756e-02</internalNodes>
+          <leafValues>
+            9.9000000953674316e-01 -9.9688887596130371e-01</leafValues></_></weakClassifiers></_>
+    <!-- stage 1 -->
+    <_>
+      <maxWeakCount>2</maxWeakCount>
+      <stageThreshold>-4.1450184583663940e-01</stageThreshold>
+      <weakClassifiers>
+        <_>
+          <internalNodes>
+            0 -1 1 -2.9191201925277710e-01</internalNodes>
+          <leafValues>
+            9.2702901363372803e-01 -9.5347815752029419e-01</leafValues></_>
+        <_>
+          <internalNodes>
+            0 -1 2 -3.0112147331237793e-01</internalNodes>
+          <leafValues>
+            5.3897631168365479e-01 -9.8398619890213013e-01</leafValues></_></weakClassifiers></_></stages>
+  <features>
+    <_>
+      <rects>
+        <_>
+          3 32 36 5 -1.</_>
+        <_>
+          12 32 18 5 2.</_></rects>
+      <tilted>0</tilted></_>
+    <_>
+      <rects>
+        <_>
+          11 13 27 24 -1.</_>
+        <_>
+          11 25 27 12 2.</_></rects>
+      <tilted>0</tilted></_>
+    <_>
+      <rects>
+        <_>
+          13 10 25 30 -1.</_>
+        <_>
+          13 25 25 15 2.</_></rects>
+      <tilted>0</tilted></_></features></cascade>
+</opencv_storage>

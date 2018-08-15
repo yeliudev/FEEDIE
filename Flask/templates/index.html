@@ -186,14 +186,15 @@
       input = '',
       flag = false,
       count = 0,
-      food = ['bread', 'water']
+      food = ['bread', 'water'],
+      probableFood = ['bread', 'water']
 
     function onInit() {
       $.ajax({
         type: 'GET',
         url: '{{ url_for("app_init") }}',
         success: function (res) {
-          if (res === 'Success') {
+          if (res) {
             console.log('App init successfully')
           }
         }
@@ -208,12 +209,13 @@
       document.getElementById('logo').style.display = 'none'
       document.getElementById('input-box').focus()
 
-      // Request for voice recognition
+      // Request for speech recognition
       $.ajax({
         type: 'GET',
         url: '{{ url_for("start_recording") }}',
         fail: function (err) {
           document.getElementById('output').innerHTML = 'Error'
+          console.log(err)
         }
       })
 
@@ -236,45 +238,40 @@
               type: 'GET',
               url: '{{ url_for("speech_recognition") }}',
               data: data,
-              dataType: 'json',
               success: function (res) {
-                if (res['keyword'] === 'Hello' || res['keyword'] === 'hello') {
+                if (res['keyword'] === 'hello') {
                   document.getElementById('output').innerHTML = 'Hello~'
-                  document.getElementById('flipper').style.transform = ''
-                  document.getElementById('input-box').value = ''
-                  count = 0
-                } else if (res['keyword'] === 'Thank' || res['keyword'] === 'thank') {
-                  document.getElementById('output').innerHTML = 'You are welcome~'
-                  document.getElementById('flipper').style.transform = ''
                   document.getElementById('input-box').value = ''
                   count = 0
                 } else if (food.indexOf(res['keyword']) != -1) {
-                  document.getElementById('output').innerHTML = res['keyword'] === 'bread' ? 'Bread? Sure' : 'Water? Sure'
-                  document.getElementById('flipper').style.transform = ''
+                  document.getElementById('output').innerHTML = res['keyword'] + '? Sure'
                   document.getElementById('input-box').value = ''
                   count = 0
-                  setTimeout('switch2Video("' + res['keyword'] + '")', 1500)
+                  setTimeout('switch2Video("' + res['keyword'] + '")', 1000)
+                } else if (res['keyword'] === 'thank') {
+                  document.getElementById('output').innerHTML = 'You are welcome~'
+                  document.getElementById('input-box').value = ''
+                  count = 0
                 } else if (res['keyword']) {
                   document.getElementById('output').innerHTML = 'Sorry but what is ' + res['keyword'] + '?'
-                  document.getElementById('flipper').style.transform = ''
                   document.getElementById('input-box').value = ''
                   count = 0
                 } else {
                   document.getElementById('output').innerHTML = "Sorry, I don't understand"
-                  document.getElementById('flipper').style.transform = ''
                   count++
                   if (count >= 3) {
                     document.getElementById('input-box').value = ''
                     count = 0
                   }
                 }
+                document.getElementById('flipper').style.transform = ''
                 input = ''
               },
               fail: function (err) {
                 document.getElementById('output').innerHTML = 'Error'
+                console.log(err)
               }
             })
-
             flag = false
           } else {
             flag = true
@@ -297,10 +294,10 @@
         type: 'GET',
         url: '{{ url_for("status") }}',
         success: function (res) {
-          console.log(res)
           if (!res) {
             document.getElementById('input-box').value = ''
             clearInterval(id)
+            // Set interval
             id = setInterval('checkInput()', 800)
           }
         }

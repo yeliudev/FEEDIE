@@ -21,16 +21,24 @@ class ObjectRecognizer(object):
         self.window_name = window_name
         self.camera_idx = camera_idx
 
-        self.faceClassfier = cv2.CascadeClassifier(
+        self.faceClassifier = cv2.CascadeClassifier(
             '/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml')
-        self.breadClassfier = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Modules/cascade_bread_11stages.xml')
-        self.classifier = self.faceClassfier
+        self.breadClassifier = cv2.CascadeClassifier(
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_bread_11stages.xml')
+        self.breadClassifier2 = cv2.CascadeClassifier(
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_bread_6stages.xml')
+        self.cupClassifier = cv2.CascadeClassifier(
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_3stages.xml')
+        self.cupClassifier2 = cv2.CascadeClassifier(
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_8stages.xml')
+        self.cupClassifier3 = cv2.CascadeClassifier(
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_2stages.xml')
+        self.classifier = self.cupClassifier3
 
-        # self.ser = serial.Serial(port, 9600)
+        self.ser = serial.Serial(port, 9600)
 
     def catchUsbVideo(self):
-        cv2.namedWindow(self.window_name, 0)
+        cv2.namedWindow(self.window_name, 1)
         # cv2.resizeWindow(self.window_name, 100, 100)
 
         cap = cv2.VideoCapture(self.camera_idx)
@@ -45,21 +53,6 @@ class ObjectRecognizer(object):
             # Create gray level image
             grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            with open('/Volumes/Data/Git/Feeding-Robot-Demo/Modules/queue.txt', 'r+') as f:
-                # Read command from file
-                command = f.read()
-
-                if command:
-                    # Change classifier
-                    if command == 'bread':
-                        self.classifier = self.breadClassfier
-                    else:
-                        self.classifier = self.faceClassfier
-
-                    # Clear temp file
-                    f.seek(0, 0)
-                    f.truncate()
-
             # Object recognition
             if self.classifier:
                 faceRects = self.classifier.detectMultiScale(
@@ -70,7 +63,7 @@ class ObjectRecognizer(object):
                     center_x = int(x + w / 2)
                     center_y = int(y + h / 2)
 
-                    if self.classifier == self.breadClassfier:
+                    if self.classifier == self.breadClassifier:
                         if center_x > 570 and center_x < 700:
                             count += 1
                             if count >= 20:
@@ -78,7 +71,7 @@ class ObjectRecognizer(object):
                                 sleep(2)
                                 self.ser.write('g'.encode())
                                 sleep(2)
-                                self.classifier = self.faceClassfier
+                                self.classifier = self.faceClassifier
                         else:
                             count = 0
 
@@ -111,13 +104,13 @@ class ObjectRecognizer(object):
 
     def switchClassfier(self, classifier):
         if classifier == 'face':
-            self.classifier = self.faceClassfier
+            self.classifier = self.faceClassifier
         elif classifier == 'bread':
-            self.classifier = self.breadClassfier
+            self.classifier = self.breadClassifier
 
 
 if __name__ == '__main__':
     # 0 for original camera, 1 for webcam
     detector = ObjectRecognizer(
-        'ObjectRecognition', 0, '/dev/cu.usbmodem14341')
+        'ObjectRecognition', 1, '/dev/cu.usbmodem14141')
     detector.catchUsbVideo()
