@@ -98,6 +98,17 @@ class VideoCamera(object):
                         # Send pick water message
                         ser.write('w'.encode())
                         # Switch back to face classifier
+                        redis.set('classifier', 'feed')
+                        redis.set('count', '0')
+                    else:
+                        redis.set('count', str(count))
+                elif command == b'feed':
+                    count = int(redis.get('count'))
+                    count += 1
+                    if count >= 30:
+                        # Send feed message
+                        ser.write('s'.encode())
+                        # Switch back to face classifier
                         redis.set('classifier', '')
                         redis.set('count', '0')
                     else:
@@ -107,10 +118,11 @@ class VideoCamera(object):
                 if command == b'water':
                     coordinate = 'z' + str(center_x) + \
                         ',' + str(center_y) + 'q'
-                else:
+                    ser.write(coordinate.encode())
+                elif command != b'feed':
                     coordinate = 'c' + str(center_x) + \
                         ',' + str(center_y) + 'q'
-                ser.write(coordinate.encode())
+                    ser.write(coordinate.encode())
 
                 cv2.rectangle(frame, (x - 10, y - 10),
                               (x + w + 10, y + h + 10), self.color, 2)
