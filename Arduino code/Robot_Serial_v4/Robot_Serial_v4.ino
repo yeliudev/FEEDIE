@@ -181,6 +181,19 @@ void pickWater()
   }
 }
 
+void feedFood()
+{
+  delay(1000);
+
+  speed = 200;
+
+  for (pos = 0; pos <= speed; pos++)
+  {
+    servoG.write(int(map(pos, 0, speed, CRAW_CLOSE, CRAW_OPEN)));
+    delay(5);
+  }
+}
+
 void feedWater()
 {
   speed = 200;
@@ -409,6 +422,7 @@ void loop()
       'o': turn towards desk
       'p': pick food
       'w': pick water
+      'x': feed food
       's': feed water
       'h': say hello
       't': you are welcome
@@ -446,6 +460,10 @@ void loop()
     case 'w':
       pickWater();
       Serial.println("Pick water");
+      break;
+    case 'x':
+      feedFood();
+      Serial.println("Feed food");
       break;
     case 's':
       feedWater();

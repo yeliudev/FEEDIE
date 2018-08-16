@@ -41,6 +41,10 @@ class VideoCamera(object):
             '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_3stages.xml')
         self.cupClassifier2 = cv2.CascadeClassifier(
             '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_8stages.xml')
+        self.cupClassifier3 = cv2.CascadeClassifier(
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_2stages.xml')
+        self.cupClassifier4 = cv2.CascadeClassifier(
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_3stages2.xml')
         self.classifier = self.faceClassifier
 
     def __del__(self):
@@ -62,7 +66,7 @@ class VideoCamera(object):
         if command == b'bread':
             self.classifier = self.breadClassifier
         elif command == b'water':
-            self.classifier = self.cupClassifier
+            self.classifier = self.cupClassifier4
         else:
             self.classifier = self.faceClassifier
 
@@ -85,41 +89,72 @@ class VideoCamera(object):
                             # Send pick bread message
                             ser.write('p'.encode())
                             # Switch back to face classifier
-                            redis.set('classifier', '')
+                            redis.set('classifier', 'feed_food')
                             redis.set('count', '0')
                         else:
                             redis.set('count', str(count))
                     else:
                         redis.set('count', '0')
                 elif command == b'water':
-                    count = int(redis.get('count'))
-                    count += 1
-                    if count >= 15:
-                        # Send pick water message
-                        ser.write('w'.encode())
-                        # Switch back to face classifier
-                        redis.set('classifier', 'feed')
-                        redis.set('count', '0')
+                    if center_x > 570 and center_x < 700:
+                        count = int(redis.get('count'))
+                        count += 1
+                        if count >= 15:
+                            # Send pick water message
+                            ser.write('w'.encode())
+                            # Switch back to face classifier
+                            redis.set('classifier', 'feed_water')
+                            redis.set('count', '0')
+                        else:
+                            redis.set('count', str(count))
                     else:
-                        redis.set('count', str(count))
-                elif command == b'feed':
-                    count = int(redis.get('count'))
-                    count += 1
-                    if count >= 30:
-                        # Send feed message
-                        ser.write('s'.encode())
-                        # Switch back to face classifier
-                        redis.set('classifier', '')
                         redis.set('count', '0')
+
+                    # count = int(redis.get('count'))
+                    # count += 1
+                    # if count >= 15:
+                    #     # Send pick water message
+                    #     ser.write('w'.encode())
+                    #     # Switch back to face classifier
+                    #     redis.set('classifier', 'feed_water')
+                    #     redis.set('count', '0')
+                    # else:
+                    #     redis.set('count', str(count))
+                elif command == b'feed_food':
+                    if center_x > 570 and center_x < 700:
+                        count = int(redis.get('count'))
+                        count += 1
+                        if count >= 30:
+                            # Send feed food message
+                            ser.write('x'.encode())
+                            # Switch back to face classifier
+                            redis.set('classifier', '')
+                            redis.set('count', '0')
+                        else:
+                            redis.set('count', str(count))
                     else:
-                        redis.set('count', str(count))
+                        redis.set('count', '0')
+                elif command == b'feed_water':
+                    if center_x > 570 and center_x < 700:
+                        count = int(redis.get('count'))
+                        count += 1
+                        if count >= 30:
+                            # Send feed water message
+                            ser.write('s'.encode())
+                            # Switch back to face classifier
+                            redis.set('classifier', '')
+                            redis.set('count', '0')
+                        else:
+                            redis.set('count', str(count))
+                    else:
+                        redis.set('count', '0')
 
                 # Send serial data
                 if command == b'water':
                     coordinate = 'z' + str(center_x) + \
                         ',' + str(center_y) + 'q'
                     ser.write(coordinate.encode())
-                elif command != b'feed':
+                elif command != b'feed_food' and command != b'feed_water':
                     coordinate = 'c' + str(center_x) + \
                         ',' + str(center_y) + 'q'
                     ser.write(coordinate.encode())
@@ -209,12 +244,12 @@ def speech_recognition():
             redis.set('classifier', 'water')
 
             return jsonify({'keyword': 'Water'})
-        elif item[0] == 'Hello' or item[0] == 'hello':
+        elif item[0] == 'Hello' or item[0] == 'hello' or item[0] == 'Hi' or item[0] == 'hi' or item[0] == 'morning' or item[0] == 'afternoon' or item[0] == 'evening':
             # Send 'hello' message
             ser.write('h'.encode())
 
             return jsonify({'keyword': 'hello'})
-        elif item[0] == 'Thank' or item[0] == 'thank':
+        elif item[0] == 'Thank' or item[0] == 'thank' or item[0] == 'Thanks' or item[0] == 'thanks':
             print('Keyword: thank you\n')
 
             # Send 'thank you' message
@@ -234,6 +269,17 @@ def speech_recognition():
             redis.set('classifier', 'bread')
 
             return jsonify({'keyword': 'bread?'})
+
+        if item[1] == 'NN' and item[0] in ['What', 'what', 'Whatever', 'whatever', 'Walk', 'walk']:
+            print('Keyword:', item[0], '(water)\n')
+
+            # Send 'object' message (turn towards desk)
+            ser.write('o'.encode())
+
+            # Switch classifier
+            redis.set('classifier', 'water')
+
+            return jsonify({'keyword': 'water?'})
 
     # Search for other keywords
     for item in tagged_words:

@@ -186,8 +186,8 @@
       input = '',
       flag = false,
       count = 0,
-      food = ['bread', 'water'],
-      probableFood = ['bread', 'water']
+      food = ['Bread', 'Water'],
+      probableFood = ['bread?', 'water?']
 
     function onInit() {
       $.ajax({
@@ -225,7 +225,10 @@
 
     function checkInput() {
       var newInput = document.getElementById('input-box').value
-      if (newInput) {
+      if (input === 'q') {
+        document.getElementById('input-box').value = ''
+      }
+      else if (newInput) {
         if (newInput === input) {
           if (flag) {
             // Construct request data
@@ -245,6 +248,11 @@
                   count = 0
                 } else if (food.indexOf(res['keyword']) != -1) {
                   document.getElementById('output').innerHTML = res['keyword'] + '? Sure'
+                  document.getElementById('input-box').value = ''
+                  count = 0
+                  setTimeout('switch2Video("' + res['keyword'] + '")', 1000)
+                } else if (probableFood.indexOf(res['keyword']) != -1) {
+                  document.getElementById('output').innerHTML = 'Do you mean ' + res['keyword'] + '? Sure'
                   document.getElementById('input-box').value = ''
                   count = 0
                   setTimeout('switch2Video("' + res['keyword'] + '")', 1000)

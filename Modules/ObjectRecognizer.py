@@ -33,9 +33,11 @@ class ObjectRecognizer(object):
             '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_8stages.xml')
         self.cupClassifier3 = cv2.CascadeClassifier(
             '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_2stages.xml')
-        self.classifier = self.cupClassifier3
+        self.cupClassifier4 = cv2.CascadeClassifier(
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_3stages2.xml')
+        self.classifier = self.cupClassifier4
 
-        self.ser = serial.Serial(port, 9600)
+        # self.ser = serial.Serial(port, 9600)
 
     def catchUsbVideo(self):
         cv2.namedWindow(self.window_name, 1)
@@ -112,5 +114,5 @@ class ObjectRecognizer(object):
 if __name__ == '__main__':
     # 0 for original camera, 1 for webcam
     detector = ObjectRecognizer(
-        'ObjectRecognition', 1, '/dev/cu.usbmodem14141')
+        'ObjectRecognition', 0, '/dev/cu.usbmodem14141')
     detector.catchUsbVideo()
