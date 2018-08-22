@@ -2,8 +2,6 @@
   <img width="450" src="assets/logo-color.png" />
 </p>
 
----
-
 ## Introduction
 
 FEEDIE (pronounced `/ˈfi:di/`, combination of **feed** and **foodie**) is a feeding robot specially designed for people who couldn't eat independently. According to our survey, over 20% of the families around us have at least one person who couldn't take care of himself. In these families, about 18% of them think highly of a feeding robot while over 60% of them would still wait and see, who can be regard as potential customers.
@@ -11,7 +9,8 @@ FEEDIE (pronounced `/ˈfi:di/`, combination of **feed** and **foodie**) is a fee
 You can download and have a look at our warm up video by [clicking here](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/assets/WarmUp.mp4?raw=true).
 
 <p align="center">
-  <img width="300px" src="assets/grabbing_algorithm.gif" />
+  <img width="300px" src="assets/preview.gif" hspace="50px" />
+  <img width="247px" src="assets/UI.gif" hspace="50px" />
 </p>
 
 ## Code Catalog
