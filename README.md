@@ -32,7 +32,7 @@ You can download and have a look at our warm up video by [clicking here](https:/
 
 ## Author
 
-Ye Liu, School of Resource and Environmental Science, Wuhan University
+Liu Ye, School of Resource and Environmental Science, Wuhan University
 
 ## License
 
