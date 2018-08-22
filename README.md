@@ -4,7 +4,9 @@
 
 ## Introduction
 
-FEEDIE (pronounced `/ˈfi:di/`, combination of **feed** and **foodie**) is a feeding robot specially designed for people who couldn't eat independently. According to our survey, over 20% of the families around us have at least one person who couldn't take care of himself. In these families, about 18% of them think highly of a feeding robot while over 60% of them would still wait and see, who can be regard as potential customers.
+FEEDIE (pronounced `/ˈfi:di/`, combination of **feed** and **foodie**) is a feeding robot specially designed for people who couldn't eat or drink independently. Everybody can interact and control the robot by natural language instructions. After receiving message from a user, FEEDIE can extract keywords from the instructions, find what they want on the table, and feed it into the user's mouth.
+
+Our core techniques consist of **Speech Recognition**, **Image Recognition**, **Grabbing Algorithm** and **Human Computer Interaction**.
 
 You can download and have a look at our warm up video by [clicking here](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/assets/WarmUp.mp4?raw=true).
 
@@ -12,6 +14,13 @@ You can download and have a look at our warm up video by [clicking here](https:/
   <img width="300px" src="assets/preview.gif" hspace="50px" />
   <img width="247px" src="assets/UI.gif" hspace="50px" />
 </p>
+
+## Hardware Configuration
+
+* SainSmart DIY 6-Axis Servos Control Palletizing Robot Arm
+* Arduino/Genuino 101 Board
+* Logitech c270 web camera
+* AC adapter
 
 ## Code Catalog
 
@@ -27,4 +36,6 @@ Ye Liu, School of Resource and Environmental Science, Wuhan University
 
 ## License
 
-[MIT License](http://opensource.org/licenses/MIT)
+[MIT License](LICENSE)
+
+Copyright (c) 2018 goolhanrry
