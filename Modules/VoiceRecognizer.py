@@ -2,26 +2,24 @@
 # -*- coding: utf-8 -*-
 
 # ********************************************
-# Voice Recognition Model v2
+# Voice Recognition Model v3
 # for feeding robot arm
 # By Ye Liu
-# Aug 2 2018
+# Aug 23 2018
 # ********************************************
 
 import wave
 import pyaudio
 import nltk
-import serial
 from time import sleep
 from os import remove
 from aip import AipSpeech
 import numpy as np
-import speech_recognition as sr
 
 
 class VoiceRecognizer(object):
 
-    def __init__(self, port):
+    def __init__(self):
         self.APP_ID = '11615546'
         self.API_KEY = 'Agl9OnFc63ssaEXQGLvkop7c'
         self.SECRET_KEY = 'm206FgGobfv5jmdXTMnHtAY7kZ3gG8EH'
@@ -38,31 +36,22 @@ class VoiceRecognizer(object):
         self.NN_IGNORE_LIST = ['piece', 'cup',
                                'bottle', 'bar', 'spoon', 'bowl', 'oh']
 
-        self.ser = serial.Serial(port, 9600)
-
     def get_file_content(self, filePath):
         with open(filePath, 'rb') as fp:
             return fp.read()
 
     # Return keywords of the speech
     def recognize(self):
-        # Recognize voice via Baidu or Sphinx API
-        try:
-            res = self.client.asr(self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
-                'dev_pid': 1737,
-            })
-        except:
-            r = sr.Recognizer()
-            audio_file = sr.AudioFile(self.WAVE_OUTPUT_FILENAME)
-            with audio_file as source:
-                audio_data = r.record(source)
-            res = {'err_no': 0, 'result': r.recognize_sphinx(audio_data)}
+        # Recognize voice via Baidu API
+        res = self.client.asr(self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
+            'dev_pid': 1737,
+        })
 
         # Remove temp wav file
         remove(self.WAVE_OUTPUT_FILENAME)
 
         if res['err_no'] == 0:
-            # print('Result:', res['result'][0])
+            print('Result:', res['result'][0])
 
             words = nltk.word_tokenize(str(res['result'][0]))
             tagged_words = nltk.pos_tag(words)
@@ -152,19 +141,9 @@ class VoiceRecognizer(object):
                 wf.writeframes(b''.join(rec))
                 wf.close()
 
-                res = self.recognize()
-
-                if res == 'bread':
-                    # Send 'object' message
-                    self.ser.write('o'.encode())
-                    # Switch classifier
-                    with open('/Volumes/Data/Git/Feeding-Robot-Demo/Modules/queue.txt', 'w') as f:
-                        f.write('bread')
-                elif res == 'hello':
-                    # Send 'hello' message
-                    self.ser.write('h'.encode())
+                self.recognize()
 
 
 if __name__ == '__main__':
-    detector = VoiceRecognizer('/dev/cu.usbmodem14341')
+    detector = VoiceRecognizer()
     detector.monitor()

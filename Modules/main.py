@@ -10,12 +10,6 @@
 
 import os
 
-# Set serial port
-port = '/dev/cu.usbmodem14131'
-
-with open('/Volumes/Data/Git/Feeding-Robot-Demo/Modules/queue.txt', 'w') as f:
-    f.truncate()
-
 pid = os.fork()
 if pid:
     os.execlp('python3', 'python3',

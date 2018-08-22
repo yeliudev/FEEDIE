@@ -146,7 +146,7 @@ void pickWater()
 
   for (pos = 0; pos <= speed; pos++)
   {
-    servoA.write(int(map(pos, 0, speed, currentA, 65)));
+    servoA.write(int(map(pos, 0, speed, currentA, 75)));
     delay(5);
   }
 
@@ -183,9 +183,17 @@ void pickWater()
 
 void feedFood()
 {
-  delay(1000);
-
   speed = 200;
+
+  currentC = servoC.read();
+
+  for (pos = 0; pos <= speed; pos++)
+  {
+    servoC.write(int(map(pos, 0, speed, currentC, 130)));
+    delay(5);
+  }
+
+  delay(2500);
 
   for (pos = 0; pos <= speed; pos++)
   {
@@ -198,13 +206,23 @@ void feedWater()
 {
   speed = 200;
 
-  delay(1000);
+  currentA = servoA.read();
+  currentB = servoB.read();
+
+  for (pos = 0; pos <= speed; pos++)
+  {
+    servoA.write(int(map(pos, 0, speed, currentA, currentA - 15)));
+    servoB.write(int(map(pos, 0, speed, currentB, currentB - 15)));
+    delay(5);
+  }
+
+  delay(2500);
 
   currentD = servoD.read();
 
   for (pos = 0; pos <= 1200; pos++)
   {
-    servoD.write(int(map(pos, 0, speed, currentD, 130)));
+    servoD.write(int(map(pos, 0, speed, currentD, 40)));
     delay(5);
   }
 

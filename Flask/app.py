@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 
 # ********************************************
-# User Interface Model v2
+# User Interface Model v3
 # for feeding robot arm
 # By Ye Liu
-# Aug 15 2018
+# Aug 23 2018
 # ********************************************
 
 import cv2
 import nltk
-import serial
 import pyautogui as pag
+import serial
+from flask import Flask, Response, jsonify, render_template, request
 from redis import StrictRedis
-from flask import Flask, render_template, Response, request, jsonify
 
-# run 'redis-server /usr/local/etc/redis.conf' first
+# run 'redis-server /usr/local/etc/redis.conf' and set hotkey of 'Dictation' to 'ctrl + shift + q' first
 ser = serial.Serial('/dev/cu.usbmodem14141', 9600)
 
 # Redis initialization
@@ -34,17 +34,9 @@ class VideoCamera(object):
         self.faceClassifier = cv2.CascadeClassifier(
             '/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml')
         self.breadClassifier = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_bread_11stages.xml')
-        self.breadClassifier2 = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_bread_6stages.xml')
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_bread_18-8-13_11stages.xml')
         self.cupClassifier = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_3stages.xml')
-        self.cupClassifier2 = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_8stages.xml')
-        self.cupClassifier3 = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_2stages.xml')
-        self.cupClassifier4 = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_3stages2.xml')
+            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_18-8-16_6stages.xml')
         self.classifier = self.faceClassifier
 
     def __del__(self):
@@ -66,7 +58,7 @@ class VideoCamera(object):
         if command == b'bread':
             self.classifier = self.breadClassifier
         elif command == b'water':
-            self.classifier = self.cupClassifier4
+            self.classifier = self.cupClassifier
         else:
             self.classifier = self.faceClassifier
 
@@ -76,74 +68,63 @@ class VideoCamera(object):
                 grey, scaleFactor=1.1, minNeighbors=3, minSize=(150, 150))
 
             if len(objectRects):
-                # Load the first object
-                (x, y, w, h) = objectRects[0]
+                # Load the biggest object
+                size = 0
+                for rect in objectRects:
+                    if rect[2] * rect[3] > size:
+                        (x, y, w, h) = rect
+
+                # Get center point coordinate
                 center_x = int(x + w / 2)
                 center_y = int(y + h / 2)
 
-                if command == b'bread':
-                    if center_x > 570 and center_x < 700:
-                        count = int(redis.get('count'))
-                        count += 1
-                        if count >= 10:
-                            # Send pick bread message
-                            ser.write('p'.encode())
-                            # Switch back to face classifier
-                            redis.set('classifier', 'feed_food')
-                            redis.set('count', '0')
-                        else:
-                            redis.set('count', str(count))
-                    else:
-                        redis.set('count', '0')
-                elif command == b'water':
-                    if center_x > 570 and center_x < 700:
-                        count = int(redis.get('count'))
-                        count += 1
-                        if count >= 15:
-                            # Send pick water message
-                            ser.write('w'.encode())
-                            # Switch back to face classifier
-                            redis.set('classifier', 'feed_water')
-                            redis.set('count', '0')
-                        else:
-                            redis.set('count', str(count))
-                    else:
-                        redis.set('count', '0')
+                # Show detected object
+                cv2.rectangle(frame, (x - 10, y - 10),
+                              (x + w + 10, y + h + 10), self.color, 2)
 
-                    # count = int(redis.get('count'))
-                    # count += 1
-                    # if count >= 15:
-                    #     # Send pick water message
-                    #     ser.write('w'.encode())
-                    #     # Switch back to face classifier
-                    #     redis.set('classifier', 'feed_water')
-                    #     redis.set('count', '0')
-                    # else:
-                    #     redis.set('count', str(count))
-                elif command == b'feed_food':
+                cv2.putText(frame, 'Size: %d%%' % int(
+                    100 * h / frame.shape[0]), (x + 5, y + 30), self.font, 1, (255, 0, 255), 3)
+
+                # Position detection
+                if command in [b'bread', b'water']:
                     if center_x > 570 and center_x < 700:
-                        count = int(redis.get('count'))
-                        count += 1
-                        if count >= 30:
-                            # Send feed food message
-                            ser.write('x'.encode())
-                            # Switch back to face classifier
-                            redis.set('classifier', '')
+                        count = int(redis.get('count')) + 1
+                        if count >= 10:
+                            # Send 'pick' message and switch classifier
+                            if command == b'bread':
+                                ser.write('p'.encode())
+                                redis.set('classifier', 'feed_food')
+                            else:
+                                ser.write('w'.encode())
+                                redis.set('classifier', 'feed_water')
+
+                            # Reset count
                             redis.set('count', '0')
+
+                            # Return real-time image
+                            ret, jpeg = cv2.imencode('.jpg', frame)
+                            return jpeg.tobytes()
                         else:
                             redis.set('count', str(count))
                     else:
                         redis.set('count', '0')
-                elif command == b'feed_water':
+                elif command in [b'feed_food', b'feed_water']:
                     if center_x > 570 and center_x < 700:
-                        count = int(redis.get('count'))
-                        count += 1
-                        if count >= 30:
-                            # Send feed water message
-                            ser.write('s'.encode())
+                        count = int(redis.get('count')) + 1
+                        if count >= 15:
+                            # Send 'feed' message
+                            if command == b'feed_food':
+                                ser.write('x'.encode())
+                            else:
+                                ser.write('s'.encode())
+
                             # Switch back to face classifier
                             redis.set('classifier', '')
                             redis.set('count', '0')
+
+                            # Return real-time image
+                            ret, jpeg = cv2.imencode('.jpg', frame)
+                            return jpeg.tobytes()
                         else:
                             redis.set('count', str(count))
                     else:
@@ -154,16 +135,10 @@ class VideoCamera(object):
                     coordinate = 'z' + str(center_x) + \
                         ',' + str(center_y) + 'q'
                     ser.write(coordinate.encode())
-                elif command != b'feed_food' and command != b'feed_water':
+                else:
                     coordinate = 'c' + str(center_x) + \
                         ',' + str(center_y) + 'q'
                     ser.write(coordinate.encode())
-
-                cv2.rectangle(frame, (x - 10, y - 10),
-                              (x + w + 10, y + h + 10), self.color, 2)
-
-                cv2.putText(frame, 'Size: %d%%' % int(
-                    100 * h / frame.shape[0]), (x + 5, y + 30), self.font, 1, (255, 0, 255), 3)
 
         ret, jpeg = cv2.imencode('.jpg', frame)
         return jpeg.tobytes()
@@ -227,7 +202,7 @@ def speech_recognition():
         if item[0] == 'Bread' or item[0] == 'bread':
             print('Keyword: bread\n')
 
-            # Send 'object' message (turn towards desk)
+            # Send 'object' message (turn towards table)
             ser.write('o'.encode())
 
             # Switch classifier
@@ -262,7 +237,7 @@ def speech_recognition():
         if item[1] == 'NN' and item[0] in ['Breath', 'breath', 'Crap', 'crap', 'Crab', 'crab', 'Brat', 'brat']:
             print('Keyword:', item[0], '(bread)\n')
 
-            # Send 'object' message (turn towards desk)
+            # Send 'object' message (turn towards table)
             ser.write('o'.encode())
 
             # Switch classifier
@@ -273,7 +248,7 @@ def speech_recognition():
         if item[1] == 'NN' and item[0] in ['What', 'what', 'Whatever', 'whatever', 'Walk', 'walk']:
             print('Keyword:', item[0], '(water)\n')
 
-            # Send 'object' message (turn towards desk)
+            # Send 'object' message (turn towards table)
             ser.write('o'.encode())
 
             # Switch classifier
@@ -283,7 +258,7 @@ def speech_recognition():
 
     # Search for other keywords
     for item in tagged_words:
-        if item[1] == 'NN' and item[0] not in ['piece', 'cup',
+        if item[1] == 'NN' and item[0] not in ['piece', 'cup', 'tea',
                                                'bottle', 'bar', 'spoon', 'bowl', 'oh', 'please']:
             print('Keyword:', item[0], '\n')
 
