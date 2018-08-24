@@ -8,7 +8,7 @@ FEEDIE (pronounced `/ˈfi:di/`, combination of **feed** and **foodie**) is a fee
 
 Our core techniques consist of **Speech Recognition**, **Image Recognition**, **Grabbing Algorithm** and **Human Computer Interaction**.
 
-You can download and have a look at our warm up video by [clicking here](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/WarmUp.mp4?raw=true).
+You can download and have a look at our [warm up video](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/WarmUp.mp4?raw=true) and [demo](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/Demo.mov?raw=true).
 
 <p align="center">
   <img width="300px" src="Supporting%20files/preview.gif" hspace="50px" />
