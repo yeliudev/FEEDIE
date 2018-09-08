@@ -8,7 +8,7 @@ FEEDIE (pronounced `/ˈfi:di/`, combination of **feed** and **foodie**) is a fee
 
 Our core techniques consist of **Speech Recognition**, **Image Recognition**, **Grabbing Algorithm** and **Human Computer Interaction**.
 
-You can download and have a look at our [warm up video](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/WarmUp.mp4?raw=true) and [demo](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/Demo.mov?raw=true).
+You can download and have a look at our [warm up video](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/WarmUp.mp4?raw=true), [product introduction](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/product%20introduction%20v3.pptx?raw=true) and [demo](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/Demo.mov?raw=true).
 
 <p align="center">
   <img width="300px" src="Supporting%20files/preview.gif" hspace="50px" />
@@ -24,7 +24,7 @@ You can download and have a look at our [warm up video](https://github.com/goolh
 
 ## Code Catalog
 
-* Arduino code - Serial communication logic & food grabbing algorithm
+* Arduino - Serial communication logic & object grabbing algorithm
 * Classifier - [OpenCV](https://opencv.org/) cascade classifiers
 * Flask - User Interaction module
 * Modules *(abandoned)* - Speech & object recognition models
