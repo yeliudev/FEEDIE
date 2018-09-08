@@ -27,7 +27,7 @@ You can download and have a look at our [product introduction](https://github.co
 * Arduino - Serial communication logic & object grabbing algorithm
 * Classifier - [OpenCV](https://opencv.org/) cascade classifiers
 * Flask - User Interaction module
-* Modules *(abandoned)* - Speech & object recognition models
+* Modules *(abandoned)* - Speech & Object recognition models
 * Training - Cascade classifier training tool
 
 ## Author
