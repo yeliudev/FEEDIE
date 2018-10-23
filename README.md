@@ -4,7 +4,7 @@
 
 ## Introduction
 
-FEEDIE (pronounced `/ˈfi:di/`, combination of **feed** and **foodie**) is a feeding robot specially designed for people who couldn't eat or drink independently. According to our [survey](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/DataAnalysis.pptx?raw=true), over 15% of the families have at least one person who couldn't take care of himself while over 20% of them have a great demand for a robot to help them. One can interact and control the robot by natural language instructions. After receiving message from a user, FEEDIE can extract keywords from the instructions, find what the user want on the table, and feed it into his mouth.
+FEEDIE (pronounced `/ˈfi:di/`, combination of **feed** and **foodie**) is a feeding robot specially designed for people who couldn't eat or drink independently. According to our [survey](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/DataAnalysis.pptx?raw=true), over 15% of the families have at least one person who couldn't take care of himself and over 20% of them have a great demand for a robot to help them. One can interact and control the robot by natural language instructions. After receiving message from a user, FEEDIE can extract keywords from the instructions, find what the user want on the table, and feed it into his mouth.
 
 Our core techniques consist of **Speech Recognition**, **Image Recognition**, **Grabbing Algorithm** and **Human Computer Interaction**.
 
