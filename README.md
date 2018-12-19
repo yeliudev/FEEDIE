@@ -11,8 +11,8 @@ Our core techniques consist of **Speech Recognition**, **Image Recognition**, **
 You can download and have a look at our [product introduction](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/Product%20Introducton%20v3.pptx?raw=true) and [demo](https://github.com/goolhanrry/Feeding-Robot-Demo/blob/master/Supporting%20files/Demo.mov?raw=true).
 
 <p align="center">
-  <img width="300px" src="Supporting%20files/preview.gif" hspace="50px" />
-  <img width="247px" src="Supporting%20files/UI.gif" hspace="50px" />
+  <img width="300" src="Supporting%20files/preview.gif" hspace="50px" />
+  <img width="247" src="Supporting%20files/UI.gif" hspace="50px" />
 </p>
 
 ## Hardware Configuration
@@ -38,4 +38,4 @@ Liu Ye, School of Resource and Environmental Science, Wuhan University
 
 [MIT License](LICENSE)
 
-Copyright (c) 2018 goolhanrry
+Copyright (c) 2019 goolhanrry
