@@ -1,20 +1,13 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# ********************************************
-# Voice Recognition Model v3
-# for feeding robot arm
-# By Ye Liu
-# Aug 23 2018
-# ********************************************
+# Copyright (c) Ye Liu. All rights reserved.
 
 import wave
-import pyaudio
-import nltk
-from time import sleep
 from os import remove
-from aip import AipSpeech
+from time import sleep
+
+import nltk
 import numpy as np
+import pyaudio
+from aip import AipSpeech
 
 
 class VoiceRecognizer(object):
@@ -33,8 +26,9 @@ class VoiceRecognizer(object):
         self.RECORD_SECONDS = 1
         self.WAVE_OUTPUT_FILENAME = 'output.wav'
 
-        self.NN_IGNORE_LIST = ['piece', 'cup',
-                               'bottle', 'bar', 'spoon', 'bowl', 'oh']
+        self.NN_IGNORE_LIST = [
+            'piece', 'cup', 'bottle', 'bar', 'spoon', 'bowl', 'oh'
+        ]
 
     def get_file_content(self, filePath):
         with open(filePath, 'rb') as fp:
@@ -43,9 +37,10 @@ class VoiceRecognizer(object):
     # Return keywords of the speech
     def recognize(self):
         # Recognize voice via Baidu API
-        res = self.client.asr(self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
-            'dev_pid': 1737,
-        })
+        res = self.client.asr(
+            self.get_file_content(self.WAVE_OUTPUT_FILENAME), 'wav', 16000, {
+                'dev_pid': 1737,
+            })
 
         # Remove temp wav file
         remove(self.WAVE_OUTPUT_FILENAME)
@@ -58,7 +53,9 @@ class VoiceRecognizer(object):
             # print('Tagged:', tagged_words)
 
             for item in tagged_words:
-                if item[1] == 'NN' and item[0] in ['bread', 'breath', 'crap', 'crab']:
+                if item[1] == 'NN' and item[0] in [
+                        'bread', 'breath', 'crap', 'crab'
+                ]:
                     print('Keyword: bread\n')
                     return 'bread'
 
@@ -78,11 +75,12 @@ class VoiceRecognizer(object):
         sleep(1)
 
         p = pyaudio.PyAudio()
-        stream = p.open(format=self.FORMAT,
-                        channels=self.CHANNELS,
-                        rate=self.RATE,
-                        input=True,
-                        frames_per_buffer=self.CHUNK)
+        stream = p.open(
+            format=self.FORMAT,
+            channels=self.CHANNELS,
+            rate=self.RATE,
+            input=True,
+            frames_per_buffer=self.CHUNK)
 
         while True:
             test_data = stream.read(self.CHUNK)
@@ -110,7 +108,8 @@ class VoiceRecognizer(object):
                 detecting = True
                 stream.start_stream()
 
-            for i in range(0, int(self.RATE / self.CHUNK * self.RECORD_SECONDS)):
+            for i in range(0,
+                           int(self.RATE / self.CHUNK * self.RECORD_SECONDS)):
                 data = stream.read(self.CHUNK)
                 frames.append(data)
                 index += 1

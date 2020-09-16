@@ -1,12 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# ********************************************
-# Object Recognition Model v2
-# for feeding robot arm
-# By Ye Liu
-# Aug 23 2018
-# ********************************************
+# Copyright (c) Ye Liu. All rights reserved.
 
 import cv2
 
@@ -20,11 +12,12 @@ class ObjectRecognizer(object):
         self.camera_idx = camera_idx
 
         self.faceClassifier = cv2.CascadeClassifier(
-            '/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml')
+            '/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml'  # noqa
+        )
         self.breadClassifier = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_bread_18-8-13_11stages.xml')
+            'Classifier/cascade_bread_18-8-13_11stages.xml')
         self.cupClassifier = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_18-8-16_6stages.xml')
+            'Classifier/cascade_cup_18-8-16_6stages.xml')
         self.classifier = self.faceClassifier
 
     def catchUsbVideo(self):
@@ -64,8 +57,10 @@ class ObjectRecognizer(object):
                     cv2.rectangle(frame, (x - 10, y - 10),
                                   (x + w + 10, y + h + 10), self.color, 2)
 
-                    cv2.putText(frame, 'Size: %d%%' % int(
-                        100 * h / frame.shape[0]), (x + 5, y + 30), self.font, 1, (255, 0, 255), 3)
+                    cv2.putText(frame,
+                                'Size: %d%%' % int(100 * h / frame.shape[0]),
+                                (x + 5, y + 30), self.font, 1, (255, 0, 255),
+                                3)
 
             # Show image
             cv2.imshow(self.window_name, frame)

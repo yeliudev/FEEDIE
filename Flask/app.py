@@ -1,12 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# ********************************************
-# User Interface Model v3
-# for feeding robot arm
-# By Ye Liu
-# Aug 23 2018
-# ********************************************
+# Copyright (c) Ye Liu. All rights reserved.
 
 import cv2
 import nltk
@@ -15,7 +7,8 @@ import serial
 from flask import Flask, Response, jsonify, render_template, request
 from redis import StrictRedis
 
-# run 'redis-server /usr/local/etc/redis.conf' and set hotkey of 'Dictation' to 'ctrl + shift + q' first
+# run 'redis-server /usr/local/etc/redis.conf'
+# and set hotkey of 'Dictation' to 'ctrl + shift + q' first
 ser = serial.Serial('/dev/cu.usbmodem14141', 9600)
 
 # Redis initialization
@@ -25,6 +18,7 @@ redis.set('classifier', '')
 
 
 class VideoCamera(object):
+
     def __init__(self):
         self.video = cv2.VideoCapture(1)
 
@@ -32,11 +26,12 @@ class VideoCamera(object):
         self.font = cv2.FONT_HERSHEY_SIMPLEX
 
         self.faceClassifier = cv2.CascadeClassifier(
-            '/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml')
+            '/usr/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt2.xml'  # noqa
+        )
         self.breadClassifier = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_bread_18-8-13_11stages.xml')
+            'Classifier/cascade_bread_18-8-13_11stages.xml')
         self.cupClassifier = cv2.CascadeClassifier(
-            '/Volumes/Data/Git/Feeding-Robot-Demo/Classifier/cascade_cup_18-8-16_6stages.xml')
+            'Classifier/cascade_cup_18-8-16_6stages.xml')
         self.classifier = self.faceClassifier
 
     def __del__(self):
@@ -82,8 +77,9 @@ class VideoCamera(object):
                 cv2.rectangle(frame, (x - 10, y - 10),
                               (x + w + 10, y + h + 10), self.color, 2)
 
-                cv2.putText(frame, 'Size: %d%%' % int(
-                    100 * h / frame.shape[0]), (x + 5, y + 30), self.font, 1, (255, 0, 255), 3)
+                cv2.putText(frame,
+                            'Size: %d%%' % int(100 * h / frame.shape[0]),
+                            (x + 5, y + 30), self.font, 1, (255, 0, 255), 3)
 
                 # Position detection
                 if command in [b'bread', b'water']:
@@ -161,8 +157,9 @@ def gen(camera):
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(gen(VideoCamera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(
+        gen(VideoCamera()),
+        mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/app_init')
@@ -219,12 +216,15 @@ def speech_recognition():
             redis.set('classifier', 'water')
 
             return jsonify({'keyword': 'Water'})
-        elif item[0] == 'Hello' or item[0] == 'hello' or item[0] == 'Hi' or item[0] == 'hi' or item[0] == 'morning' or item[0] == 'afternoon' or item[0] == 'evening':
+        elif item[0] == 'Hello' or item[0] == 'hello' or item[
+                0] == 'Hi' or item[0] == 'hi' or item[0] == 'morning' or item[
+                    0] == 'afternoon' or item[0] == 'evening':
             # Send 'hello' message
             ser.write('h'.encode())
 
             return jsonify({'keyword': 'hello'})
-        elif item[0] == 'Thank' or item[0] == 'thank' or item[0] == 'Thanks' or item[0] == 'thanks':
+        elif item[0] == 'Thank' or item[0] == 'thank' or item[
+                0] == 'Thanks' or item[0] == 'thanks':
             print('Keyword: thank you\n')
 
             # Send 'thank you' message
@@ -234,7 +234,10 @@ def speech_recognition():
 
     # Search for probable keywords
     for item in tagged_words:
-        if item[1] == 'NN' and item[0] in ['Breath', 'breath', 'Crap', 'crap', 'Crab', 'crab', 'Brat', 'brat']:
+        if item[1] == 'NN' and item[0] in [
+                'Breath', 'breath', 'Crap', 'crap', 'Crab', 'crab', 'Brat',
+                'brat'
+        ]:
             print('Keyword:', item[0], '(bread)\n')
 
             # Send 'object' message (turn towards table)
@@ -245,7 +248,9 @@ def speech_recognition():
 
             return jsonify({'keyword': 'bread?'})
 
-        if item[1] == 'NN' and item[0] in ['What', 'what', 'Whatever', 'whatever', 'Walk', 'walk']:
+        if item[1] == 'NN' and item[0] in [
+                'What', 'what', 'Whatever', 'whatever', 'Walk', 'walk'
+        ]:
             print('Keyword:', item[0], '(water)\n')
 
             # Send 'object' message (turn towards table)
@@ -258,8 +263,10 @@ def speech_recognition():
 
     # Search for other keywords
     for item in tagged_words:
-        if item[1] == 'NN' and item[0] not in ['piece', 'cup', 'tea',
-                                               'bottle', 'bar', 'spoon', 'bowl', 'oh', 'please']:
+        if item[1] == 'NN' and item[0] not in [
+                'piece', 'cup', 'tea', 'bottle', 'bar', 'spoon', 'bowl', 'oh',
+                'please'
+        ]:
             print('Keyword:', item[0], '\n')
 
             return jsonify({'keyword': item[0]})

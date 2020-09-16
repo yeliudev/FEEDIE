@@ -1,12 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# ********************************************
-# Serial message printer v1
-# for feeding robot arm
-# By Ye Liu
-# Aug 9 2018
-# ********************************************
+# Copyright (c) Ye Liu. All rights reserved.
 
 import serial
 
