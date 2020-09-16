@@ -4,11 +4,11 @@
 
 ## Introduction
 
-FEEDIE (pronounced `/ˈfi:di/`, combination of **feed** and **foodie**) is a feeding robot specially designed for people who couldn't eat or drink independently. According to our [survey](https://github.com/c1aris/Feeding-Robot-Demo/blob/master/Supporting%20files/DataAnalysis.pptx?raw=true), over 15% of the families have at least one person who couldn't take care of himself and over 20% of them have a great demand for a robot to help them. One can interact and control the robot by natural language instructions. After receiving message from a user, FEEDIE can extract keywords from the instructions, find what the user want on the table, and feed it into his mouth.
+FEEDIE (pronounced `/ˈfi:di/`, combination of **feed** and **foodie**) is a feeding robot specially designed for people who couldn't eat or drink independently. According to our [survey](https://github.com/yeliudev/FEEDIE/blob/master/Supporting%20files/DataAnalysis.pptx?raw=true), over 15% of the families have at least one person who couldn't take care of himself and over 20% of them have a great demand for a robot to help them. One can interact and control the robot by natural language instructions. After receiving message from a user, FEEDIE can extract keywords from the instructions, find what the user want on the table, and feed it into his mouth.
 
 Our core techniques consist of **Speech Recognition**, **Image Recognition**, **Grabbing Algorithm** and **Human Computer Interaction**.
 
-You can [click here](https://youtu.be/WOYQ2A6ZiRU) to watch a video of demo or download our [product introduction](https://github.com/c1aris/Feeding-Robot-Demo/blob/master/Supporting%20files/Product%20Introducton%20v3.pptx?raw=true).
+You can [click here](https://youtu.be/WOYQ2A6ZiRU) to watch a video of demo or download our [product introduction](https://github.com/yeliudev/FEEDIE/blob/master/Supporting%20files/Product%20Introducton%20v3.pptx?raw=true).
 
 <p align="center">
   <img width="300" src="Supporting%20files/preview.gif" hspace="50px" />
@@ -34,4 +34,4 @@ You can [click here](https://youtu.be/WOYQ2A6ZiRU) to watch a video of demo or d
 
 [MIT License](LICENSE)
 
-Copyright (c) 2019 c1aris
+Copyright (c) 2020 Ye Liu
